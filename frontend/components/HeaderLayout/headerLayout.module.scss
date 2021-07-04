@@ -1,0 +1,165 @@
+@use "../../styles/mixins.scss" as mixins;
+@use "../../styles/vars.scss" as vars;
+
+
+.headerLayout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1920px;
+    min-width: 400px;
+}
+
+.nav {
+    width: 100%;
+   
+    height: 70px;
+    @include mixins.flexBox();
+    & .container {
+        width: 100%;
+        min-width: 400px;
+        max-width: 1920px;
+        padding: 0 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: inherit;
+        .checkBox_label {
+            display: none;
+            position: absolute;
+            @media (max-width:800px) {
+                &:checked  {
+                    & ~ .left {
+                        .icon__arrowBack {
+                            display: block
+                        } 
+                        .icon__container {
+                            display: none;
+                        }
+                        .burger {
+                            display: none;
+                        }
+                    }
+                    & ~ .center {
+                        & > button {
+                            display: block
+                        }
+                        & > input {
+                            display: block
+                        }
+                    }
+                    & ~ .right {
+                        .right__searchIcon {
+                            display: none
+                        }
+                        .right__auth {
+                            display: none
+                        }
+                    }
+                }
+            }
+            
+        }
+        & .left {
+            @include mixins.flexBox();
+            width:100px;
+            height: inherit;
+            & .icon__arrowBack {
+                display: none;
+                width: 30px;
+                height: 30px;
+                cursor: pointer;
+            }
+            & .icon__container {
+                height: inherit;
+                @include mixins.flexBox();
+                & .icon__youtube {
+                    position: relative;
+                    top:-1px;
+                    margin: 0 0 0 24px;
+                    width:30px;
+                    height:30px;
+                }
+            }
+          
+        }
+
+        & .center {
+            @include mixins.flexBox();
+            height: inherit;
+            & .icon__search {
+                width: 10px;
+                height: 10px;
+            }
+          
+            & > button {
+                width: 65px;
+                height: 27px;
+                border: 1px solid rgb(204,204,204);
+                @media (max-width:800px) {
+                    display: none;
+                }
+            }
+            & > input {
+                outline:1px solid rgb(204,204,204);
+                min-width: 120px;
+                width: 500px;
+                height: 25px;
+                padding:10px;
+                font-size: 16px;
+                line-height: 24px;
+                font-weight: 400;
+                &:focus {
+                    outline:1px solid darkblue;
+                }
+                @media (max-width:800px) {
+                    display: none;
+                }
+                @media (max-width:700px) {
+                    width: 60vw;
+                }
+            }
+        }
+        & .right {
+            @include mixins.flexBox();
+            height: inherit;
+            
+            & .icon__upload {
+                width:15px;
+                height:15px;
+                margin: 0 25px 0 0;
+                cursor: pointer;
+            }
+            &__image {
+                cursor: pointer;
+                border-radius: 50%;
+            }
+            &__searchIcon {
+                display: none;
+                margin: 0 15px 0 0;
+                cursor: pointer;
+                .icon__search {
+                    fill:vars.$secondary;
+                    width:20px;
+                    height:20px;
+                }
+                @media (max-width:800px) {
+                    display: block;
+                }
+            }
+        }
+    }
+   
+}
+
+.main {
+    width: 100%;
+    max-width: 1920px;
+    min-width: 400px;
+    @media(max-width:400px) {
+        width: 400px;
+    }
+}
+
+

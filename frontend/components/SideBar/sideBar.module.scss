@@ -1,0 +1,26 @@
+@use "../../styles/mixins.scss" as mixins;
+@use "../../styles/vars.scss" as vars;
+
+.sideBar {
+    width: 280px;
+    min-width: 280px;
+    min-height: 100vh;
+   
+    &__container {
+        width: 100%;
+        height: inherit;
+    }
+    &_active {
+        width: 70px;
+        min-width: 70px;
+    }
+    
+    @media (max-width:1000px) {
+        width: 70px;
+        min-width: 70px;
+    }
+    @media (max-width:800px) {
+        display: none;
+    }
+}
+

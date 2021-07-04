@@ -1,0 +1,240 @@
+@use "../../styles/mixins.scss" as mixins;
+@use "../../styles/vars.scss" as vars;
+
+.sideBarContent {
+    width: 100%;
+    // height: inherit;
+    @include mixins.flexBox();
+    flex-direction: column;
+
+    &__line {
+        width: 100%;
+        > div {
+            left: 0;
+            width: 95%;
+            height: 1px;
+            background-color: rgba($color: black, $alpha: 0.1);
+            margin: 15px 0;
+        }
+        &_notPortal {
+            @media (max-width:1000px) {
+                display: none;
+            }
+        }
+       
+    }
+    &__activeList {
+        width: 100%;
+    }
+    &__addedList {
+        width: 100%;
+    }
+    &__subscribers {
+        &_notPortal {
+            @media (max-width:1000px) {
+                display: none;
+            }
+        }
+    }
+    &__auth {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
+        padding: 0 0 0 25px;
+        > span {
+            text-align: left;
+            color:#030303;
+            max-width: 150px;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: .2px;
+        }
+        div {
+            margin: 10px 0 0;
+        }
+        &_notPortal {
+            @media (max-width:1000px) {
+                display: none;
+            }
+        }
+    }
+    &_active {
+        // width: 70px;
+        // min-width: 70px;
+       
+        .icon {
+            width: 30px;
+            height: 30px;
+        }
+        .sideBarContent__line {
+            display: none;
+        }
+        .sideBarContent__subscribers {
+            display: none;
+        }
+        .sideBarContent__line {
+            display: none;
+        }
+        .list {
+            &__item {
+                @include mixins.flexBox();
+                span {
+                    display: none;
+                }
+                height: 60px;
+                flex-direction: column;
+                padding: 0;
+                &_active {
+                    @media (min-width:1000px) {
+                        background-color: inherit;
+                    }
+                    .icon {
+                        fill: red;
+                    }
+                }
+            }
+            
+        }
+    }
+}
+
+
+
+.list {
+    width: 100%;
+    &__item {
+        padding: 5px 10px 5px 20px;
+        width: 95%;
+        @include mixins.flexBox();
+        justify-content: flex-start;
+        height: 40px;
+        cursor: pointer;
+        position: relative;
+
+        span {
+            text-overflow:ellipsis;
+            max-width: 150px;
+            overflow: hidden;
+            margin: 0 0 0 15px;
+            white-space: nowrap;
+            font-weight: 400;
+           
+        }
+        &_active {
+            span {
+                font-weight: 600;
+            }
+            .icon {
+                fill: red;
+            }
+        }
+      
+    }
+    &_notPortal {
+        .list__item {
+            &_active {
+                @media (min-width:1000px) {
+                    background-color: rgba($color: black, $alpha: 0.1);
+                }
+            }
+            &:hover {
+                @media (min-width:1000px) {
+                    background-color: rgba($color: black, $alpha: 0.1);
+                }
+            }
+            span {
+                @media (max-width:1000px) {
+                    display: none;
+                }
+            }
+            @media (max-width:1000px) {
+                @include mixins.flexBox();
+                height: 60px;
+                flex-direction: column;
+                padding: 0;
+            }
+        }
+    }
+   
+}
+
+
+.subscribers {
+    width: 100%;
+    &__container {
+        width: 100%;
+    }
+    &__title {
+        padding: 3px 0 3px 20px;
+        height: 26px;
+        color:vars.$secondary;
+        text-transform:uppercase;
+        font-weight: 500;
+    }
+    &__image {
+        border-radius: 50%;
+    }
+    &__button {
+        @include mixins.flexBox();
+        justify-content: flex-start;
+        padding: 5px 0 5px 20px;
+        width: 100%;
+        cursor: pointer;
+        &:hover {
+            background-color: rgba($color: black, $alpha: 0.1);
+        }
+        span {
+            text-overflow:ellipsis;
+            max-width: 150px;
+            overflow: hidden;
+            margin: 0 0 0 10px;
+            font-weight: 400;
+            white-space: nowrap;
+        }
+    }
+}
+
+.arrow {
+    position: relative;
+    @include mixins.flexBox();
+    width: 15px;
+    height: 15px;
+    
+    &::after,&::before {
+        content: "";
+        position: absolute;
+        width: 7px;
+        height: 1px;
+        background-color: black;
+    }
+    &::after {
+        transform: rotate(45deg);
+        left: 2px;
+    }
+    &::before {
+        right: 2px;
+        transform: rotate(-45deg);
+    }
+    &_active {
+        &::after {
+            transform: rotate(-45deg);
+        }
+        &::before {
+            transform: rotate(45deg);
+        }
+    }
+}
+
+
+.icon {
+    width: 25px;
+    height: 25px;
+    fill: rgba($color: black, $alpha: 0.7);
+    &_notPortal {
+        @media (max-width:1000px) {
+            width: 30px;
+            height: 30px;
+        }
+    }
+}

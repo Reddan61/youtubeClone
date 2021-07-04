@@ -1,0 +1,8 @@
+@use "../../styles/mixins" as mixins;
+
+.burger {
+    width: 24px;
+    height: 24px;
+    fill: #606060;
+    cursor: pointer;
+}

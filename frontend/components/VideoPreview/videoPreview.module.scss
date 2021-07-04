@@ -1,0 +1,83 @@
+@use "../../styles/mixins" as mixins;
+@use "../../styles/vars" as vars;
+
+.videoPreview {
+    width: 350px;
+    &__container {
+        width: 100%;
+        @include mixins.flexBox();
+        flex-direction: column;
+        cursor: pointer;
+    }
+    &__videoImage {
+        overflow: hidden;
+        @include mixins.flexBox();
+        height: 200px;
+    }
+    &__video {
+        cursor: pointer;
+    }
+    &__avatar {
+        border-radius: 50%;
+    }
+    &__info {
+        width: 100%;
+        display: flex;
+        padding: 7px 0 0;
+    }
+    &__bottomInfo {
+        width: 100%;
+        padding: 0 0 0 15px;
+    }
+    &__title {
+        width: 100%;
+        @include mixins.flexBox();
+        justify-content: flex-start;
+        flex-direction: column;
+        font-weight: 500;
+        min-height: 44px;
+        max-height: 44px;
+        width: 100%;
+        max-width: 290px;
+        span {
+            width: inherit;
+            overflow: hidden;
+            white-space: pre;
+            font-size: 1.2rem;
+            line-height: 1.6rem;
+            text-overflow:ellipsis;
+        }
+
+    }
+    &__username {
+        @include mixins.flexBox();
+        justify-content: flex-start;
+        padding: 7px 0 0;
+        color: vars.$secondary;
+        span {
+            max-width: 270px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+        }
+    }
+    &__viewers {
+        @include mixins.flexBox();
+        justify-content: flex-start;
+        padding: 7px 0 0;
+        color: vars.$secondary;
+        span {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+        }
+    }
+    &__dot {
+        width: 3px;
+        height: 3px;
+        background-color: vars.$secondary;
+        margin: 0 5px 0 5px;
+        border-radius: 50%;
+    }
+}

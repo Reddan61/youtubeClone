@@ -1,0 +1,95 @@
+@use "../../styles/mixins" as mixins;
+
+.sideBar {
+    left:0;
+    top:0;
+    position: fixed;
+    width: 100%;
+    min-height: 100%;
+    background-color: rgba($color: black, $alpha: 0.5);
+    &__container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 280px;
+        min-width: 280px;
+        min-height: 100vh;
+        z-index: 2;
+        background-color: white;
+    }
+    &__top {
+        padding: 0 0 0 24px;
+        width: 100px;
+        height: 70px;
+        @include mixins.flexBox();
+    }
+    &__line {
+      
+        width: 100%;
+        > div {
+            left: 0;
+            width: 95%;
+            height: 1px;
+            background-color: rgba($color: black, $alpha: 0.1);
+            margin: 15px 0;
+        }
+        &_first{
+            >div {
+                margin: 0 0 15px;
+            }
+        }
+    }
+}
+
+.icon__container {
+    height: inherit;
+    @include mixins.flexBox();
+    & .icon__youtube {
+        position: relative;
+        top:-1px;
+        margin: 0 0 0 24px;
+        width:30px;
+        height:30px;
+    }
+}
+
+.animation {
+    &Root {
+        &__enter {
+            background-color: rgba($color: black, $alpha: 0);
+        }
+        
+        &__enter_active {
+            transition: background-color .3s ease 0s;
+            background-color: rgba($color: black, $alpha: 0.5);
+        }
+    
+        &__exit {
+            background-color: rgba($color: black, $alpha: 0.5);
+        }
+        &__exit_active {
+            transition: background-color .3s ease 0s;
+
+            background-color: rgba($color: black, $alpha: 0);
+        }
+    }
+    &Container {
+        &__appear {
+            transform: translate(-100%);
+        }
+        
+        &__appear_active {
+            transition: all .3s ease 0s;
+            transform: translate(0);
+        }
+    
+        &__exit {
+            transform: translate(0);
+        }
+        &__exit_active {
+            transition: all .5s ease 0s;
+            transform: translate(-100%);
+        }
+    }
+   
+}

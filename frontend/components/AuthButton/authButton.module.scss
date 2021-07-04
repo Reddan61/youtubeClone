@@ -1,0 +1,26 @@
+@use "../../styles/mixins" as mixins;
+
+$color:#065FD4;
+
+.authButton {
+    min-width: 115px;
+    width: 115px;
+    &__container {
+        border: 1px solid $color;
+        padding: 5px 0;
+        cursor: pointer;
+        width: 100%;
+        @include mixins.flexBox();
+        color:$color;
+        text-transform: uppercase;
+        font-weight: 500;
+        span {
+            margin: 0 0 0 7px;
+        }
+    }
+    .icon {
+        width: 25px;
+        height: 25px;
+        fill:$color;
+    }
+}
