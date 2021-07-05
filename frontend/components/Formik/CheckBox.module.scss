@@ -1,0 +1,96 @@
+.checkbox {
+    display: inline-block;
+    input {
+        display: none;
+        &:checked + label .checkbox__box {
+            >span {
+                visibility: visible;
+            }
+            .checkbox__forAnimation {
+                animation-name: animationCheckBox;
+                animation-duration: .2s;
+            }
+            border-color: #1a73e8;
+            background-color: #1a73e8;
+        }
+    }
+    &__forAnimation {
+        width: 14px;
+        height: 12px;
+        background-color: #1a73e8;
+        position: absolute;
+        visibility: hidden;
+    }
+    &__container {
+        position: absolute;
+        z-index: -1;
+        width: 35px;
+        height: 35px;
+        visibility: hidden;
+        border-radius: 50%;
+        background-color:#f7f8f8;
+    }
+    label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        width: auto; 
+        >span {
+            user-select: none;
+            margin:0 0 0 16px;
+        }
+        .checkbox__box {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #5f6368;
+            border-radius: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            &:hover {
+                border-color: black;
+                .checkbox__container {
+                    visibility: visible;
+                }
+            }
+            > span {
+                visibility: hidden;
+                display: flex;
+                width: 18px;
+                height: 18px;
+                position: relative;
+                align-items: center;
+                justify-content: center;
+                &::before,&::after {
+                    content: "";
+                    position: absolute;
+                    width: 12px;
+                    height: 2px;
+                    background-color: white;
+                }
+                &::before {
+                    width: 6px;
+                    transform: rotate(45deg); 
+                    left: 0px;
+                    bottom:5px;   
+                }
+                &::after {
+                    right: -1px;   
+                    transform: rotate(-44deg);    
+                }
+            }
+        }
+        
+    }
+}
+
+@keyframes animationCheckBox {
+    0% {
+        visibility: visible;
+        transform: translate(0) scale(1);
+    }
+    100% {
+        visibility: hidden;
+        transform: translate(6px,-5px) scale(0.2);
+    }
+} 

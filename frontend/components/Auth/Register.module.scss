@@ -1,0 +1,12 @@
+.register {
+
+    &__input {
+        width: 168px;
+        height: 32px;
+        font-size: 14px !important;
+        padding: 6px 8px !important;
+        + label {
+            font-size: 14px !important;
+        }
+    }
+}
