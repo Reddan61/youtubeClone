@@ -1,12 +1,177 @@
-.register {
+$mainColor: #202124;
+$secondColor: #5f6368;
 
-    &__input {
-        width: 168px;
-        height: 32px;
-        font-size: 14px !important;
-        padding: 6px 8px !important;
-        + label {
+.register {
+    width: 100%;
+    position: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    &__container {
+        width: 750px;
+        height: 650px;
+        border: 1px solid rgb(218,220,224);
+        display: flex;
+        padding: 48px 40px 36px;
+    }
+    &__progress {
+        width: 720px !important;
+    }
+    &__loading {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba($color: lighten(grey,10%), $alpha: 0.1);
+    }
+    &__right {
+        width: 100%;
+        padding: 72px 0 0 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    &__singleAcc {
+        width: 244px;
+        font-size: 16px;
+        font-weight: 300;
+        text-align: center;
+    } 
+    &__content {
+        min-width: 354px;
+        position: relative;
+        overflow: hidden;
+    }
+    &__top {
+        display: flex;
+        flex-direction: column;
+        color:$mainColor;
+    }
+    &__title {
+        padding: 16px 0 0;
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 1.3333;
+    }
+    &__subTitle {
+        padding: 8px 0 0;
+        font-size: 16px;
+        font-weight: 400;
+        letter-spacing: 0.1px;
+        line-height: 1.5;
+    }
+    &__input { 
+        input {
+            width: 168px;
+            height: 32px;
             font-size: 14px !important;
+            padding: 6px 8px !important;
+        }    
+        label {
+            font-size: 14px !important;
+        }  
+    }
+    &__checkbox {
+        grid-area: checkbox;
+        padding: 16px 0 0;
+    }
+    &__text {
+        color: $secondColor;
+        font-weight: 400;
+        font-size: 12px;
+        margin-left: 10px;
+        padding: 8px 0 0;
+
+        &_email {
+            grid-area: textEmail;
         }
+        &_password {
+            grid-area: textPassword;
+        }
+    }
+}
+
+.icon {
+    &__google {
+        width: 75px;
+        height: 24px;
+    }
+    &__account {
+        width: 244px;
+        height: 244px;
+    }
+}
+.form {
+    position: relative;
+    height: 462px;
+    &__content {
+        padding: 24px 0 0;
+        display: grid;
+        grid-template-columns: repeat(2,168px);
+        column-gap: 10px;;
+        grid-template-areas: 
+            "name secondName"
+            "email email"
+            "textEmail textEmail"
+            "password passwordSub"
+            "textPassword textPassword"
+            "checkbox checkbox"
+        ;
+    }
+    &__buttons {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0 40px;
+    }
+}
+.input {
+    &__name {
+        grid-area: name;
+    }
+    &__secondName {
+        grid-area: secondName;
+    }
+    &__password {
+        padding: 24px 0 0;
+        grid-area: password;
+    }
+    &__passwordSub {
+        padding: 24px 0 0;
+        grid-area: passwordSub;
+    }
+    &__email {
+        grid-area: email;
+        padding: 24px 0 0;
+        input {
+            width: 352px !important;
+            height: 34px !important;
+        }
+    }
+}
+
+
+.animation {
+    &__appear {
+        transform: translateX(-100%)
+    }
+    &__appear_active {
+        transition: all .3s ease 0s;
+        transform: translateX(0);
+    }
+    &__exit {
+        transform: translateX(0);
+    }
+    &__exit_active {
+        transition: all .3s ease 0s;
+        transform: translateX(-100%)
     }
 }

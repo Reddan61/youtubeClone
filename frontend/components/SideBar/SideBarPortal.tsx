@@ -8,13 +8,21 @@ import {CSSTransition } from "react-transition-group"
 import SideBarContent from "./SideBarContent";
 
 interface IProps {
-    isOpenSideBarPortal:boolean,
+    isOpenSideBarPortal?:boolean,
     setOpenSideBarPortal: (fun:(state:boolean) => boolean) => void
 }
 
 const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPortal}) => {
-    const [isBrowser,setIsBrowser] = useState(false)     
+    const [isBrowser,setIsBrowser] = useState(false) 
+    const [startAnimation,setStartAnimation] = useState(true)    
     const ref = useRef<HTMLDivElement>(null)
+    const burgerHandler = () => {
+        setStartAnimation(false)
+        setTimeout(() => {
+            setOpenSideBarPortal(state => !state)
+        },300)
+    }
+
     useEffect(() => {
         ref.current = document.createElement("div");
         const parentElem = document.querySelector('#__next');
@@ -27,7 +35,7 @@ const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPorta
 
     if(isBrowser) {
         return ReactDOM.createPortal(
-            <CSSTransition  in = {isOpenSideBarPortal} timeout = {300}
+            <CSSTransition  in = {startAnimation} timeout = {300}
                 unmountOnExit
                 classNames = {{
                     enter:classes.animationRoot__enter,
@@ -37,7 +45,7 @@ const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPorta
                 }}
             >
             <div className = {classes.sideBar}>
-            <CSSTransition in = {isOpenSideBarPortal} timeout = {300}
+            <CSSTransition in = {startAnimation} timeout = {300}
                 unmountOnExit
                 appear  ={true}
                 classNames = {{
@@ -50,7 +58,7 @@ const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPorta
                 <div className = {classes.sideBar__container}>
                     <div className = {classes.list}>
                         <div className = {classes.sideBar__top}>
-                            <div className = {classes.burger} onClick = {() => setOpenSideBarPortal(state => !state)}>
+                            <div className = {classes.burger} onClick = {burgerHandler}>
                                 <Burger />
                             </div>
                             <div className = {classes.icon__container}>

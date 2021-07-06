@@ -12,7 +12,9 @@ interface IProps {
 const SideBarLayout:React.FC<IProps> =({children,isOpenSideBar,setOpenSideBarPortal,isOpenSideBarPortal}) => {
     return <div className = {classes.root}>
         <SideBar isOpenSideBar = { isOpenSideBar }/>
-        <SideBarPortal isOpenSideBarPortal = {isOpenSideBarPortal} setOpenSideBarPortal = {setOpenSideBarPortal}/>
+        {isOpenSideBarPortal && 
+            <SideBarPortal setOpenSideBarPortal = {setOpenSideBarPortal}/>
+        }
         
         <main className = {classes.main}>
             {children}

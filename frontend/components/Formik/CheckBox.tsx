@@ -2,11 +2,12 @@ import React from "react"
 import classes from "./CheckBox.module.scss"
 
 interface IProps {
-    label:string
+    label:string,
+    classModule?:string
 }
 
-const CheckBox:React.FC<IProps> = ({label}) => {
-    return <div className = {classes.checkbox}>
+const CheckBox:React.FC<IProps> = ({label,classModule}) => {
+    return <div className = {`${classes.checkbox} ${classModule}`}>
         <input type = "checkbox" id = "checkbox"/>
         
         <label htmlFor = "checkbox">

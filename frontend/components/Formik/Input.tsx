@@ -11,12 +11,9 @@ interface IProps {
 
 const Input:React.FC<IProps> = ({width,placeholder,height,classModule}) => {
     let isError = false;
-    return <div className = {`${classes.input} ${isError && classes.input_error}`}>
+    return <div className = {`${classes.input} ${isError && classes.input_error} ${classModule}`}>
         <div className = {classes.input__container}>
-            <input className = {classModule} style = {{
-                width,
-                height
-            }} />
+            <input />
             <label>{placeholder}</label>
         </div>
         {isError && <div className = {classes.error}>

@@ -7,6 +7,9 @@ import ArrowDownIcon from "../svg/ArrowDownIcon";
 import CheckBox from "../Formik/CheckBox";
 import Router from "next/router"
 import GoogleIcon from "../svg/GoogleIcon";
+import BlueButton from "../Buttons/BlueButton/BlueButton";
+import LinkButton from "../Buttons/LinkButton/LinkButton";
+import ProgressBar from "../ProgressBar/ProgressBar";
 
 const LoginPage = () => {
     const [isMailWritten,setMailWritten] = useState(false)
@@ -22,10 +25,7 @@ const LoginPage = () => {
     }
 
     return <div className = {classes.login}>
-        {isLoading && <div className = {classes.progress}>
-                <div className = {classes.progress__slide}>
-                </div>
-            </div>}
+        {isLoading && <ProgressBar />}
         <div className = {classes.login__container}>
             {isLoading && <div className = {classes.login__loading}></div>}
             <div className = {classes.login__top}>
@@ -58,8 +58,8 @@ const LoginPage = () => {
                     <div className = {classes.login__form}>
                         <Input classModule = {classes.login__input} placeholder = {"Телефон или адрес эл.почты"}/>
                         <div className = {classes.login__buttons}>
-                            <button className = {classes.login__create} onClick = {() => Router.push("/register")}>Создать аккаунт</button>
-                            <button className = {classes.login__next} onClick = {() => handleClick(true)}>Далее</button>
+                            <LinkButton onClick = {() => Router.push("/register")} label = {"Создать аккаунт"}/>
+                            <BlueButton label = {"Далее"} onClick = {() => handleClick(true)}/>
                         </div>
                     </div>
                 </CSSTransition>
@@ -78,7 +78,7 @@ const LoginPage = () => {
                         </div>
                         
                         <div className = {classes.login__buttons}>
-                            <button className = {classes.login__next} onClick = {() => handleClick(true)}>Далее</button>
+                            <BlueButton label = {"Далее"} onClick = {() => handleClick(true)}/>
                         </div>
                     </div>
                 </CSSTransition> 

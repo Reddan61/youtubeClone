@@ -1,0 +1,15 @@
+.button {
+    //width: 130px;
+    //height:36px;
+    padding: 0.685em 0.575em;
+    color:#1a73e8;
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: .01em;
+    background-color: white;
+    transition: all .2s ease 0s;
+    &:hover {
+        background-color: rgba($color: #1a73e8, $alpha: 0.05);
+        color:darken(#1a73e8,10%)
+    }
+}

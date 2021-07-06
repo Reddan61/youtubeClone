@@ -1,0 +1,107 @@
+$mainColor: #202124;
+
+.verify {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    &__container {
+        width: 750px;
+        height: 500px;
+        border: 1px solid rgb(218,220,224);
+        display: flex;
+        padding: 48px 40px 36px;
+        position: relative;
+    }
+    &__progress {
+        width: 720px !important;
+    }
+    &__loading {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba($color: lighten(grey,10%), $alpha: 0.1);
+    }
+    &__right {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 0 0 48px;
+    }
+    &__content {
+        overflow: hidden;
+    }
+    &__top {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    &__title {
+        padding: 16px 0 0;
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 1.3333;
+        color:$mainColor;
+        max-width: 354px;
+    }
+    &__subTitle {
+        padding: 24px 0 0;
+        max-width: 354px;
+        color:$mainColor;
+        line-height: 1.4286;
+    }
+}
+
+.form {
+    padding: 16px 0 0;
+    &__input {
+        input {
+            width: 352px;
+            height: 54px;
+        }
+    }
+    &__buttons {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        margin:44px 0 0;
+    }
+}
+
+.icon {
+    &__google {
+        display: block;
+        width: 75px;
+        height: 24px;
+    }
+    &__verify {
+        position: relative;
+        top: -20px;
+        width: 244px !important;
+    }
+}
+
+
+.animation {
+    &__appear {
+        transform: translateX(100%);
+    }
+    &__appear_active {
+        transition: all .3s ease 0s;
+        transform: translateX(0);
+    }
+    &__exit {
+        transform: translateX(0);
+    }
+    &__exit_active {
+        transition: all .3s ease 0s;
+        transform: translateX(100%);
+    }
+}
