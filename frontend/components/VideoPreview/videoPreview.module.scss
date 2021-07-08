@@ -10,9 +10,16 @@
         cursor: pointer;
     }
     &__videoImage {
+        width: 100%;
         overflow: hidden;
         @include mixins.flexBox();
         height: 200px;
+        position: relative;
+    }
+    &__preview {
+        width: 100% !important;
+        position: absolute !important;
+        z-index: 1;
     }
     &__video {
         cursor: pointer;
@@ -79,5 +86,51 @@
         background-color: vars.$secondary;
         margin: 0 5px 0 5px;
         border-radius: 50%;
+    }
+  
+}
+
+.image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    // &__mask {
+    //     position: absolute;
+    //     width: 100%;
+    //     height: 100%;
+    //     background-color: black;
+    //     z-index: 3;
+    //     opacity: 0;
+    // }
+    &__img {
+        position: absolute;
+        z-index: 2;
+    }
+}
+
+
+.animation {
+    &__appear {
+        opacity: 1;
+    }
+    &__appear_active {
+        transition: all 1s ease 0s ;
+        opacity: 0;
+    }
+    &__enter {
+        opacity: 0;
+    }
+    &__enter_active {
+        transition: all .3s ease 0s ;
+        opacity: 1;
+    }
+    &__exit {
+        opacity: 1;
+    }
+    &__exit_active {
+        transition: all .3s ease 0s ;
+        opacity: 0;
     }
 }

@@ -29,6 +29,7 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
     return <div className = {classes.headerLayout}>
         <nav className = {classes.nav}>
             <div className = {classes.container}>
+                {/* Работает как переключатель */}
                 <input type = {"checkbox"} id = {"checkBox-label"} className= {classes.checkBox_label} />
                 <div className = {classes.left}>
                     <label htmlFor = {"checkBox-label"}>
@@ -49,6 +50,7 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                         <SearchIcon  classModule = {classes.icon__search}/>
                     </button>
                 </div>
+                {/* Покажется при адаптиве  */}
                 <div className = {classes.right}>
                     <label htmlFor = {"checkBox-label"}>
                         <div className = {classes.right__searchIcon}>

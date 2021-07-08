@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const SideBar:React.FC<IProps> =({isOpenSideBar}) => {
-
+    
     return <div className = {`${classes.sideBar} ${isOpenSideBar ? classes.sideBar_active : ""}`}>
         <div className = {classes.sideBar__container}>
             <SideBarContent isOpenSideBar = {isOpenSideBar}/>

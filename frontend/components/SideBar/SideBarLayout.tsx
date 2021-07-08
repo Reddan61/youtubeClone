@@ -17,7 +17,9 @@ const SideBarLayout:React.FC<IProps> =({children,isOpenSideBar,setOpenSideBarPor
         }
         
         <main className = {classes.main}>
-            {children}
+            {React.Children.map(children,(child) => {
+                return React.cloneElement(child as React.ReactElement<any>,{isOpenSideBar})
+            })}
         </main>
     </div>
 }

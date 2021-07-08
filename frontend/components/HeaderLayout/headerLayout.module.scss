@@ -112,7 +112,11 @@
                 font-weight: 400;
                 &:focus {
                     outline:1px solid darkblue;
+                    + button {
+                        border: 1px solid darkblue;
+                    }
                 }
+                
                 @media (max-width:800px) {
                     display: none;
                 }

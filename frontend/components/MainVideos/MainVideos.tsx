@@ -2,10 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import VideoPreview from "../VideoPreview/VideoPreview";
 import classes from "./mainVideos.module.scss"
 
+interface IProps {
+    isOpenSideBar? :boolean
+}
 
-const MainVideos = () => {
+const MainVideos:React.FC<IProps> = ({isOpenSideBar}) => {
     const requestRef = useRef(false);
-
+    
     const addNewVideosOnScroll = useCallback((e:Event) => {
         const percent = window.scrollY/window.innerHeight * 100
         if(percent >= 80 && requestRef.current === false) {
@@ -25,7 +28,7 @@ const MainVideos = () => {
     return <div className = {classes.mainVideos}>
         <div className = {classes.mainVideos__container}>
             <div className = {classes.mainVideos__containerVideos}>
-                <div className = {classes.mainVideos__videos}>
+                <div className = {`${classes.mainVideos__videos} ${!isOpenSideBar ? classes.mainVideos__videos_open : classes.mainVideos__videos_close}`}>
                     <VideoPreview />
                     <VideoPreview />
                     <VideoPreview />

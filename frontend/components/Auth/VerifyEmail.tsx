@@ -24,6 +24,10 @@ const VerifyEmail = () => {
             }, 300)
         }, 1000)
     }
+
+    const submit = () => {
+        Router.push("/")
+    }
     return <div className={classes.verify}>
         {isLoading && <ProgressBar classModule={classes.verify__progress} />}
         <div className={classes.verify__container}>
@@ -49,7 +53,7 @@ const VerifyEmail = () => {
                         <Input classModule={classes.form__input} placeholder={"Введите код"} />
                         <div className={classes.form__buttons}>
                             <LinkButton onClick={linkButtonHandler} label={"Назад"} />
-                            <BlueButton label={"Подтвердить"} />
+                            <BlueButton onClick = {submit} label={"Подтвердить"} />
                         </div>
                     </div>
                 </CSSTransition>
