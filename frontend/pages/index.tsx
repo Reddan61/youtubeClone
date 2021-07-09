@@ -15,7 +15,7 @@ const Index = () => {
             isOpenSideBarPortal = {isOpenSideBarPortal} 
             isOpenSideBar = {isOpenSideBar} 
         >
-            <MainVideos />
+            <MainVideos isOpenSideBar = {isOpenSideBar}/>
         </SideBarLayout>  
     </HeaderLayout>
 }

@@ -4,12 +4,17 @@ import classes from "./videoPreview.module.scss"
 import {convertDate} from "../../assets/functions/convertDate"
 import {convertTitle} from "../../assets/functions/convertVideoTitlePreview"
 import {CSSTransition} from "react-transition-group"
+import ClockIcon from '../svg/ClockIcon'
 
-const VideoPreview = () => {
+interface IProps {
+    little?:boolean
+}
+
+const VideoPreview:React.FC<IProps> = ({little = false}) => {
     const hoverRef = useRef<HTMLDivElement>(null);
     const [currentImg,setCurrentImg] = useState(null)
     const arrImgSrc = ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"]
-    
+    const titleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has";
     useEffect(() => {
         let imgTimeout : ReturnType<typeof setTimeout> = null;
         let currentIndex = 0;
@@ -37,7 +42,7 @@ const VideoPreview = () => {
             imgTimeout = null;
         }
     },[])
-    return <div className = {classes.videoPreview}>
+    return <div className = {`${classes.videoPreview} ${little && classes.videoPreview_little}`}>
         <div className = {classes.videoPreview__container}>
             <div className = {classes.videoPreview__videoImage} ref = {hoverRef}>
                 <CSSTransition in = {currentImg === null} timeout = {500} unmountOnExit
@@ -49,7 +54,7 @@ const VideoPreview = () => {
                         }}
                     > 
                     <>
-                        <Image src = {"/dog.jpg"} className = {classes.videoPreview__preview} layout = {"fixed"} width = {350} height = {200}/>
+                        <Image src = {"/imgTest.jpg"} className = {classes.videoPreview__preview} layout = {"fill"}  />
                     </>
                 </CSSTransition>
                 {arrImgSrc.map((el,index) => {
@@ -62,34 +67,33 @@ const VideoPreview = () => {
                         }}
                     > 
                         <div className = {classes.image}>
-                            {/* <CSSTransition in = {true} appear = {true} timeout = {1000} unmountOnExit
-                                classNames = {{
-                                    appear: classes.animation__appear,
-                                    appearActive: classes.animation__appear_active
-                                }}
-                            > 
-                                <div className = {classes.image__mask}></div>
-                            </CSSTransition> */}
-                            <img className = {classes.image__img} src = {el} width = {350} height = {200}/>
+                            <Image className = {classes.image__img} src = {el} layout = {"fill"}  />
                         </div>
                     </CSSTransition>
                 })}
+                <div className = {classes.videoPreview__time}>11:33</div>
+                <div className = {classes.videoPreview__later}>
+                    <ClockIcon classModule = {classes.icon__clock}/>
+                </div>
             </div>
             <div className = {classes.videoPreview__info}>
+                {!little && 
                 <div >
-                    <Image layout = {'fixed'} className = {classes.videoPreview__avatar} src = {"/dog.jpg"} width = {35} height = {35}/>
+                    <Image layout = {'fixed'} className = {classes.videoPreview__avatar} src = {"/imgTest.jpg"} width = {35} height = {35}/>
                 </div>
+                }
+                
                 <div className = {classes.videoPreview__bottomInfo}>
                     <div className = {classes.videoPreview__title}>
-                        <span className = {`showTitle`}>{convertTitle()}</span>
+                        <span className = {`showTitle`}>{convertTitle(titleText,little ? 21:undefined)}</span>
                     </div>
                     <div className = {classes.videoPreview__username}>
                         <span className = {`showTitle`}>nicknamenicknamenicknamenicknamenicknameaaaa</span>
                     </div>
                     <div className = {classes.videoPreview__viewers}>
-                        <span>1,2 тыс просмотров</span>
+                        <span className = {classes.videoPreview__viewersCount}>1,2 тыс просмотров</span>
                         <div className = {classes.videoPreview__dot}></div>
-                        <span>{convertDate()}</span>
+                        <span className = {classes.videoPreview__date}>{convertDate()}</span>
                     </div>
                 </div>
             </div>

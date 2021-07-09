@@ -3,7 +3,7 @@ import VideoPreview from "../VideoPreview/VideoPreview";
 import classes from "./mainVideos.module.scss"
 
 interface IProps {
-    isOpenSideBar? :boolean
+    isOpenSideBar :boolean
 }
 
 const MainVideos:React.FC<IProps> = ({isOpenSideBar}) => {
@@ -27,19 +27,17 @@ const MainVideos:React.FC<IProps> = ({isOpenSideBar}) => {
     },[])
     return <div className = {classes.mainVideos}>
         <div className = {classes.mainVideos__container}>
-            <div className = {classes.mainVideos__containerVideos}>
-                <div className = {`${classes.mainVideos__videos} ${!isOpenSideBar ? classes.mainVideos__videos_open : classes.mainVideos__videos_close}`}>
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                    <VideoPreview />
-                </div>
+            <div className = {`${classes.mainVideos__containerVideos} ${!isOpenSideBar ? classes.mainVideos__containerVideos_open : classes.mainVideos__containerVideos_close}`}>
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
+                <VideoPreview />
             </div>
             <div className = {classes.mainVideos__loader}>
                 loading

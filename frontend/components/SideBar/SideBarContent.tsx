@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import AuthButton from "../AuthButton/AuthButton";
 import ClockIcon from "../svg/ClockIcon";
 import HistoryIcon from "../svg/HistoryIcon";
@@ -7,6 +7,7 @@ import LikeIcon from "../svg/LikeIcon";
 import YouTubeListIcon from "../svg/YouTubeListIcon";
 import classes from "./SideBarContent.module.scss"
 import Image from 'next/image'
+import Router from "next/router"
 
 interface IProps {
     isOpenSideBar?:boolean,
@@ -16,18 +17,33 @@ interface IProps {
 
 const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false}) => {
     const [isAuth,setAuth] = useState(false)
+    const [path,setPath] = useState(null)
+    
+    const urlParse = () => {
+        const pathname = Router.pathname; 
+        const parsedPath = pathname.slice(1,pathname.indexOf('/',1) !== -1 ?pathname.indexOf('/',1) : pathname.length );
 
+        return parsedPath
+    }
+
+    const redirect = (url:string) => {
+        Router.push(url)
+    }
+
+    useEffect(() => {
+        setPath(urlParse())
+    },[])
     return <div className = {`${classes.sideBarContent} ${isOpenSideBar && classes.sideBarContent_active} ${!isPortal && classes.sideBarContent_notPortal}`}>
     <div className = {classes.sideBarContent__activeList}>
         <ul className = {`${classes.list} ${!isPortal && classes.list_notPortal}`}>
-            <li data-title = {"Главная"}
-                className = {`${classes.list__item} ${classes.list__item_active}`}>
+            <li onClick = {() => {redirect("/")}} data-title = {"Главная"}
+                className = {`${classes.list__item} ${path === "" && classes.list__item_active}`}>
                 <HomeIcon classModule = {`${classes.icon} ${!isPortal && classes.icon_notPortal}`}/>
-                <span>Главная</span>
+                <span className = {`showTitle`}>Главная</span>
             </li>
-            <li data-title = {"Подписки"} className = {`${classes.list__item}`}>
+            <li onClick = {() => redirect("/subscribers")} data-title = {"Подписки"} className = {`${classes.list__item} ${path === "subscribers" && classes.list__item_active}`}>
                 <YouTubeListIcon classModule = {`${classes.icon} ${!isPortal && classes.icon_notPortal}`}/>
-                <span>Подписки</span>
+                <span className = {`showTitle`}>Подписки</span>
             </li>
         </ul>
     </div>
