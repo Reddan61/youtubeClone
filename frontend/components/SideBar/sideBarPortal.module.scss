@@ -6,6 +6,7 @@
     position: fixed;
     width: 100%;
     min-height: 100%;
+    z-index: 99999;
     background-color: rgba($color: black, $alpha: 0.5);
     &__container {
         position: absolute;
@@ -14,7 +15,6 @@
         width: 280px;
         min-width: 280px;
         min-height: 100vh;
-        z-index: 2;
         background-color: white;
     }
     &__top {

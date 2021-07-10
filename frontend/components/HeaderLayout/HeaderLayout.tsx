@@ -3,11 +3,11 @@ import UploadIcon from '../svg/UploadIcon';
 import YoutubeIcon from '../svg/YoutubeIcon';
 import classes from "./headerLayout.module.scss"
 import Image from 'next/image'
-import React, { useState } from 'react';
+import React, {useEffect, useState } from 'react';
 import AuthButton from '../AuthButton/AuthButton';
 import ArrowBackIcon from '../svg/ArrowBackIcon';
 import Burger from '../Burger/Burger';
-import Router from "next/router"
+import { useRouter } from "next/router"
 
 interface IProps {
     setOpenSideBar: (fun:(state:boolean)=>boolean) => void,
@@ -17,7 +17,16 @@ interface IProps {
 
 const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarPortal}) => {
     const [isAuth,setAuth] = useState(false)
+    const router = useRouter()
     
+    const [searchText,setSearchText] = useState('')
+    //Отправка на api get search
+    const sendSearch = () => {
+        if(searchText.trim().length !== 0) {
+            router.push(`/search/${searchText}`)
+        }
+    }
+
     function openSideBarHandler() {
         if (window.innerWidth > 1000) {
             setOpenSideBar((prevState) => !prevState)
@@ -26,6 +35,11 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
         }
     }
 
+    useEffect(() => {
+        if(router.query.search_query) {
+            setSearchText(router.query.search_query as string)
+        }
+    },[])
     return <div className = {classes.headerLayout}>
         <nav className = {classes.nav}>
             <div className = {classes.container}>
@@ -45,9 +59,9 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                     </div>
                 </div>
                 <div className = {classes.center}>
-                    <input placeholder = {"Введите запрос"}/>
-                    <button> 
-                        <SearchIcon  classModule = {classes.icon__search}/>
+                    <input value = {searchText} onChange = {(e) => {setSearchText(e.target.value)}} placeholder = {"Введите запрос"}/>
+                    <button onClick = {sendSearch}> 
+                        <SearchIcon  classModule = {classes.icon__search} />
                     </button>
                 </div>
                 {/* Покажется при адаптиве  */}
@@ -62,7 +76,7 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                             <UploadIcon classModule = {classes.icon__upload}/>
                             <Image className ={classes.right__image} src = {"/dog.jpg"} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
                         </>
-                        : <div className = {classes.right__auth} onClick = {() => Router.push('/login')}>
+                        : <div className = {classes.right__auth} onClick = {() => router.push('/login')}>
                             <AuthButton />
                         </div>
                     }

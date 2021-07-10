@@ -1,23 +1,12 @@
-import React, { useState } from "react";
-import HeaderLayout from "../components/HeaderLayout/HeaderLayout"
+import React from "react";
+import MainLayout from "../components/MainLayout/MainLayout";
 import MainVideos from "../components/MainVideos/MainVideos";
-import SideBarLayout from "../components/SideBar/SideBarLayout"
-import VideoPreview from "../components/VideoPreview/VideoPreview";
 
 const Index = () => {
-    //Открыт - false/Закрыт - true
-    const [isOpenSideBar, setOpenSideBar] = useState(false);
-    const [isOpenSideBarPortal, setOpenSideBarPortal] = useState(false);
 
-    return <HeaderLayout setOpenSideBar = {setOpenSideBar} setOpenSideBarPortal = {setOpenSideBarPortal}>
-        <SideBarLayout 
-            setOpenSideBarPortal = {setOpenSideBarPortal} 
-            isOpenSideBarPortal = {isOpenSideBarPortal} 
-            isOpenSideBar = {isOpenSideBar} 
-        >
-            <MainVideos isOpenSideBar = {isOpenSideBar}/>
-        </SideBarLayout>  
-    </HeaderLayout>
+    return <MainLayout>
+        <MainVideos/>
+    </MainLayout>
 }
 
 

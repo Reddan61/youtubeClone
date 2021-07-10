@@ -1,30 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React from "react";
+import { useScroll } from "../Hook/useScroll";
+import LoaderIcon from "../svg/LoaderIcon";
 import VideoPreview from "../VideoPreview/VideoPreview";
 import classes from "./mainVideos.module.scss"
 
 interface IProps {
-    isOpenSideBar :boolean
+    isOpenSideBar? :boolean
 }
 
 const MainVideos:React.FC<IProps> = ({isOpenSideBar}) => {
-    const requestRef = useRef(false);
-    
-    const addNewVideosOnScroll = useCallback((e:Event) => {
-        const percent = window.scrollY/window.innerHeight * 100
-        if(percent >= 80 && requestRef.current === false) {
-            requestRef.current = true;
-            setTimeout(() => {
-                requestRef.current = false;
-            },1000)
-        }
-        
-    },[])
-    useEffect(() => {
-        window.addEventListener("scroll",addNewVideosOnScroll)
-        return () => {
-            window.removeEventListener("scroll",addNewVideosOnScroll)
-        }
-    },[])
+    const [isLoading] = useScroll();
+
+
     return <div className = {classes.mainVideos}>
         <div className = {classes.mainVideos__container}>
             <div className = {`${classes.mainVideos__containerVideos} ${!isOpenSideBar ? classes.mainVideos__containerVideos_open : classes.mainVideos__containerVideos_close}`}>
@@ -39,8 +26,10 @@ const MainVideos:React.FC<IProps> = ({isOpenSideBar}) => {
                 <VideoPreview />
                 <VideoPreview />
             </div>
-            <div className = {classes.mainVideos__loader}>
-                loading
+            <div className = {classes.mainVideos__bottom}>
+                {isLoading && 
+                    <LoaderIcon classModule = {classes.mainVideos__loader}/>
+                }
             </div>
         </div>
         

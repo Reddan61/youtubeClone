@@ -18,6 +18,61 @@
             }
         }
     }
+    &_list {
+        width: 1100px;
+        .videoPreview {
+            &__container {
+                max-width: 100%;
+                flex-direction: row;
+                align-items: flex-start !important;
+            }
+            &__videoImage {
+                min-width: 360px !important;
+                max-width: 360px !important;
+                min-height: 202px !important;
+                max-height: 202px !important;
+            }
+            &__info {
+                //100% - ширина картинки
+                max-width: calc(100% - 360px);
+                padding: 0;
+            }
+            &__username {
+                max-width: 100% !important;
+                span {
+                    padding: 0 0 0 10px;
+                }
+            }
+            &__avatar {
+                &_div {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+            }
+        }
+        @media (max-width:1400px) {
+            max-width: 900px;
+        }
+        @media (max-width:1250px) {
+            max-width: 700px;
+        }
+        @media (max-width:800px) {
+            width: 360px;
+            .videoPreview {
+                &__container {
+                    flex-direction: column;
+                }
+                &__info {
+                    width: 100%;
+                    max-width: 100%;
+                }
+                &__bottomInfo {
+                    padding: 0
+                }
+            }
+        }
+    }
     &__container {
         width: 100%;
         @include mixins.flexBox();
@@ -80,6 +135,7 @@
     }
     &__avatar {
         border-radius: 50%;
+       
     }
     &__info {
         width: 100%;
@@ -97,7 +153,7 @@
         justify-content: flex-start;
         flex-direction: column;
         font-weight: 500;
-        min-height: 44px;
+        // min-height: 44px;
         max-height: 44px;
         // max-width: 290px;
         display: flex;
@@ -120,7 +176,8 @@
         padding: 7px 0 0;
         color: vars.$secondary;
         span {
-            max-width: 270px;
+            max-width: 100%;
+            // max-width: 270px;
             overflow: hidden;
             text-overflow:ellipsis;
             white-space: nowrap;
