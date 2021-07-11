@@ -1,0 +1,23 @@
+@use "../../styles/vars" as vars;
+
+.videoPage {
+    width: 100%;
+    background-color: #f9f9f9;
+    min-height: calc(100vh - #{vars.$headerHeight});
+    &__container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 20px 0 0;
+    }
+    &__right {
+        margin: 0 0 0 20px;
+        width: 450px;
+        min-height: calc(100vh - #{vars.$headerHeight} - 20px);
+    }
+    &__left {
+       
+    }
+}
+

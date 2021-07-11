@@ -1,4 +1,4 @@
-export function convertDate(date:Date = new Date("2019-06-01")) {
+export function convertDate(date:Date) {
     let currentDate = Date.parse(String(new Date()));
     let days = (currentDate - Date.parse(String(date)))/86400000; 
     function convertMonth(days:number) {

@@ -6,12 +6,13 @@ import SideBarPortal from "./SideBarPortal";
 interface IProps {
     isOpenSideBar:boolean,
     isOpenSideBarPortal:boolean,
+    onlyPortal?:boolean,
     setOpenSideBarPortal: (fun:(state:boolean) => boolean) => void
 }
 
-const SideBarLayout:React.FC<IProps> =({children,isOpenSideBar,setOpenSideBarPortal,isOpenSideBarPortal}) => {
+const SideBarLayout:React.FC<IProps> =({children,isOpenSideBar,setOpenSideBarPortal,isOpenSideBarPortal,onlyPortal}) => {
     return <div className = {classes.root}>
-        <SideBar isOpenSideBar = { isOpenSideBar }/>
+        {!onlyPortal && <SideBar isOpenSideBar = { isOpenSideBar }/>}
         {isOpenSideBarPortal && 
             <SideBarPortal setOpenSideBarPortal = {setOpenSideBarPortal}/>
         }

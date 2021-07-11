@@ -5,6 +5,8 @@ import {convertDate} from "../../assets/functions/convertDate"
 import {convertTitle} from "../../assets/functions/convertVideoTitlePreview"
 import {CSSTransition} from "react-transition-group"
 import ClockIcon from '../svg/ClockIcon'
+import Router from 'next/router'
+import { converCountViewers } from '../../assets/functions/converCountViewers'
 
 interface IProps {
     little?:boolean,
@@ -19,6 +21,9 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
     const titleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has";
     // const titleText = "фффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффф";
     const nickaname = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    const viewersCount = 111520
+    const date = new Date("2021-06-01")
+    const time = "11:33"
     //Кол-во символов для title
     const symbolNumberTitle = useCallback(() => {
         const windowSize = window.innerWidth
@@ -35,6 +40,9 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
             }
         }
     },[])
+    const clickOnVideo = () => {
+        Router.push(`/video/${1}`)
+    }
 
     useEffect(() => {
         symbolNumberTitle();
@@ -71,7 +79,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
             imgTimeout = null;
         }
     },[])
-    return <div className = {`${classes.videoPreview} ${little && classes.videoPreview_little} ${list && classes.videoPreview_list}`}>
+    return <div onClick = {clickOnVideo} className = {`${classes.videoPreview} ${little && classes.videoPreview_little} ${list && classes.videoPreview_list}`}>
         <div className = {classes.videoPreview__container}>
             <div className = {classes.videoPreview__videoImage} ref = {hoverRef}>
                 <CSSTransition in = {currentImg === null} timeout = {500} unmountOnExit
@@ -100,7 +108,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                         </div>
                     </CSSTransition>
                 })}
-                <div className = {classes.videoPreview__time}>11:33</div>
+                <div className = {classes.videoPreview__time}>{time}</div>
                 <div className = {classes.videoPreview__later}>
                     <ClockIcon classModule = {classes.icon__clock}/>
                 </div>
@@ -117,9 +125,9 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                         <span className = {`showTitle`}>{convertTitle(titleText,titleSymbol)}</span>
                     </div>
                     {list && <div className = {classes.videoPreview__viewers}>
-                        <span className = {classes.videoPreview__viewersCount}>1,2 тыс просмотров</span>
+                        <span className = {classes.videoPreview__viewersCount}>{converCountViewers(viewersCount)}</span>
                         <div className = {classes.videoPreview__dot}></div>
-                        <span className = {classes.videoPreview__date}>{convertDate()}</span>
+                        <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
                     </div>}
                     <div className = {classes.videoPreview__username}>
                     {list && 
@@ -130,9 +138,9 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                         <span className = {`showTitle`}>{nickaname}</span>
                     </div>
                     {!list && <div className = {classes.videoPreview__viewers}>
-                        <span className = {classes.videoPreview__viewersCount}>1,2 тыс просмотров</span>
+                        <span className = {classes.videoPreview__viewersCount}>{converCountViewers(viewersCount)}</span>
                         <div className = {classes.videoPreview__dot}></div>
-                        <span className = {classes.videoPreview__date}>{convertDate()}</span>
+                        <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
                     </div>}
                 </div>
             </div>

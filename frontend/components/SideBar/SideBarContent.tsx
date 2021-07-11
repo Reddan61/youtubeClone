@@ -16,16 +16,18 @@ interface IProps {
 
 
 const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false}) => {
-    const [isAuth,setAuth] = useState(false)
+    const [isAuth,setAuth] = useState(true)
     const [path,setPath] = useState(null)
-    
+    const [isSubOpen,setIsSubOpen] = useState(false)
     const urlParse = () => {
         const pathname = Router.pathname; 
         const parsedPath = pathname.slice(1,pathname.indexOf('/',1) !== -1 ?pathname.indexOf('/',1) : pathname.length );
 
         return parsedPath
     }
-
+    const subListHandler = () => {
+        setIsSubOpen(!isSubOpen)
+    }
     const redirect = (url:string) => {
         Router.push(url)
     }
@@ -83,28 +85,28 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
             <div >
                 <ul className = {classes.list}>
                     <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/dog.jpg"} alt = {"picture"} width = {25} height = {25}/>
+                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
                         <span className = {`showTitle`}>названиеaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
                     </li>
                     <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/dog.jpg"} alt = {"picture"}width = {25} height = {25}/>
+                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"}width = {25} height = {25}/>
                         <span className = {`showTitle`}>названиеaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
                     </li>
                     <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/dog.jpg"} alt = {"picture"}width = {25} height = {25}/>
+                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"}width = {25} height = {25}/>
                         <span className = {`showTitle`}>название</span>
                     </li>
                     <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/dog.jpg"} alt = {"picture"} width = {25} height = {25}/>
+                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
                         <span className = {`showTitle`}>название</span>
                     </li>
                     
             
                 </ul>
             </div>
-            <div className = {classes.subscribers__button}>
-                <div className = {`${classes.arrow} ${classes.arrow_active}`}></div>
-                <span className = {`showTitle`}>Показать еще 15 каналов</span>
+            <div onClick = {subListHandler} className = {classes.subscribers__button}>
+                <div className = {`${classes.arrow} ${isSubOpen && classes.arrow_active}`}></div>
+                <span className = {`showTitle`}>{isSubOpen ? "Свернуть" : "Показать еще 15 каналов"}</span>
             </div>
         </div>
     </div>

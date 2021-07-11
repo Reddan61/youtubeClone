@@ -10,13 +10,14 @@ import Burger from '../Burger/Burger';
 import { useRouter } from "next/router"
 
 interface IProps {
+    onlyPortal?:boolean,
     setOpenSideBar: (fun:(state:boolean)=>boolean) => void,
     setOpenSideBarPortal: (fun:(state:boolean)=>boolean) => void,
 }
 
 
-const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarPortal}) => {
-    const [isAuth,setAuth] = useState(false)
+const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarPortal,onlyPortal}) => {
+    const [isAuth,setAuth] = useState(true)
     const router = useRouter()
     
     const [searchText,setSearchText] = useState('')
@@ -28,6 +29,10 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
     }
 
     function openSideBarHandler() {
+        if(onlyPortal) {
+            setOpenSideBarPortal((prevState) => !prevState)
+            return
+        }
         if (window.innerWidth > 1000) {
             setOpenSideBar((prevState) => !prevState)
         } else {
@@ -54,7 +59,7 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                     <div className = {classes.burger} onClick = {openSideBarHandler}>
                         <Burger />
                     </div>
-                    <div className = {classes.icon__container}>
+                    <div className = {classes.icon__container} onClick = {() => router.push("/")}>
                         <YoutubeIcon classModule = {classes.icon__youtube}/>
                     </div>
                 </div>
@@ -74,7 +79,7 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                     {
                         isAuth ? <>
                             <UploadIcon classModule = {classes.icon__upload}/>
-                            <Image className ={classes.right__image} src = {"/dog.jpg"} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
+                            <Image className ={classes.right__image} src = {"/imgTest.jpg"} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
                         </>
                         : <div className = {classes.right__auth} onClick = {() => router.push('/login')}>
                             <AuthButton />

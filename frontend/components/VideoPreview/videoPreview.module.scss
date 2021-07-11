@@ -2,7 +2,7 @@
 @use "../../styles/vars" as vars;
 
 .videoPreview {
-    width: 350px;
+    width: 355px;
     &_little {
         width: 210px;
         .videoPreview {
@@ -89,7 +89,7 @@
         overflow: hidden;
         @include mixins.flexBox();
        
-        width: 350px !important;
+        width: 355px !important;
         height: 200px !important;
         position: relative;
         

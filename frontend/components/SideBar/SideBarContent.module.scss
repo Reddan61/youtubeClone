@@ -105,7 +105,7 @@
     width: 100%;
     &__item {
         padding: 5px 10px 5px 20px;
-        width: 95%;
+        width: 100%;
         @include mixins.flexBox();
         justify-content: flex-start;
         height: 40px;
@@ -114,12 +114,17 @@
 
         span {
             text-overflow:ellipsis;
-            max-width: 150px;
+            max-width: 80%;
             overflow: hidden;
-            margin: 0 0 0 15px;
+            padding: 0 0 0 15px;
             white-space: nowrap;
             font-weight: 400;
            
+        }
+        &:hover {
+            @media (min-width:1000px) {
+                background-color: rgba($color: black, $alpha: 0.1);
+            }
         }
         &_active {
             span {
@@ -138,11 +143,7 @@
                     background-color: rgba($color: black, $alpha: 0.1);
                 }
             }
-            &:hover {
-                @media (min-width:1000px) {
-                    background-color: rgba($color: black, $alpha: 0.1);
-                }
-            }
+        
             span {
                 @media (max-width:1000px) {
                     display: none;
@@ -173,12 +174,14 @@
         font-weight: 500;
     }
     &__image {
+        width: 25px;
+        height: 25px;
         border-radius: 50%;
     }
     &__button {
         @include mixins.flexBox();
         justify-content: flex-start;
-        padding: 5px 0 5px 20px;
+        padding: 15px 0 15px 20px;
         width: 100%;
         cursor: pointer;
         &:hover {
@@ -186,7 +189,7 @@
         }
         span {
             text-overflow:ellipsis;
-            max-width: 150px;
+            max-width: 100%;
             overflow: hidden;
             margin: 0 0 0 10px;
             font-weight: 400;
