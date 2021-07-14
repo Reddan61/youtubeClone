@@ -71,6 +71,19 @@ const Player:React.FC<IProps> = ({src}) => {
         videoRef.current.currentTime = currentTimeSeconds    
     },[])
 
+    const hoverBlock = () => {
+        const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100
+
+        setTimeout(() => {
+            if(progressBarRef && progressBarRef.current) {
+                progressBarRef.current.style.width = percent + "%"
+            }
+        },0)
+        
+        setVisibleControls(true)
+        
+    }
+
     useEffect(() => {
         const video = videoRef.current
         let interval = setInterval(() => {
@@ -91,7 +104,11 @@ const Player:React.FC<IProps> = ({src}) => {
         }
     },[])
     
-    return <div onMouseLeave = {() => setVisibleControls(false)} onMouseEnter = {() => setVisibleControls(true)} className = {classes.player}>
+    return <div onMouseMove = {() => {
+        if(!isVisibleControls) {
+            setVisibleControls(true)
+        }
+    }} onMouseLeave = {() => setVisibleControls(false)} onMouseEnter = {hoverBlock} className = {classes.player}>
         <CSSTransition in = {isVisibleControls} timeout = {300} unmountOnExit
             classNames = {{
                 enter:classes.animation__enter,

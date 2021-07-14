@@ -1,0 +1,64 @@
+@use "../../styles/vars" as vars;
+
+.save {
+    &__container {
+        display: flex;
+        align-items: center;
+        padding: 10px 5px;
+        cursor: pointer;
+    }
+    &__text {
+        padding: 0 0 0 7px;
+        text-transform: uppercase;
+        font-weight: 500;
+    }
+}
+
+.popup {
+    position: fixed;
+    width: 100%;
+    min-height: 100vh;
+    background-color: rgba($color: black, $alpha: 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    top: 0;
+    left: 0;
+    &__container {
+        display: flex;
+        flex-direction: column;
+        width: 210px;
+        background-color: white;
+    }
+    &__title {
+        display: flex;
+        width: 100%;
+        height: 48px;
+        align-items: center;
+        span {
+            font-size: 16px;
+            color:vars.$secondary;
+            padding: 0 24px;
+        }
+    }
+    &__body {
+        padding: 16px 24px;
+        border-top: 1px solid rgba($color: black, $alpha: 0.1);
+    }
+}
+
+.icon {
+    &__save {
+        width: 29px;
+        height: 29px;
+        fill: vars.$secondary;
+    }
+    &__cross {
+        cursor: pointer;
+        margin: 0 0 0 15px;
+        width: 24px;
+        height: 24px;
+        fill: vars.$secondary;
+    }
+}

@@ -214,8 +214,8 @@
     top: 0;
     left: 0;
     &__img {
-        position: absolute;
         z-index: 2;
+        position: absolute;
     }
 }
 .icon {
@@ -228,13 +228,6 @@
 }
 
 .animation {
-    &__appear {
-        opacity: 1;
-    }
-    &__appear_active {
-        transition: all 1s ease 0s ;
-        opacity: 0;
-    }
     &__enter {
         opacity: 0;
     }

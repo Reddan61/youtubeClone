@@ -1,3 +1,4 @@
 export interface Iprops {
-    classModule:string
+    classModule:string,
+    onClick?: () => any
 }

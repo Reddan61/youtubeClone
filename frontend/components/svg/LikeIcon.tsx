@@ -1,6 +1,9 @@
-import { Iprops } from "./svgInterfaces";
+interface IProps {
+    classModule:string,
+    onClick?: () => any
+}
 
-const LikeIcon:React.FC<Iprops> = ({classModule}) => {
+const LikeIcon:React.FC<IProps> = ({classModule,onClick}) => {
     return <>
         <svg display = 'none'>
                 <symbol viewBox="0 0 24 24" id = "like-icon">
@@ -10,7 +13,7 @@ const LikeIcon:React.FC<Iprops> = ({classModule}) => {
                     </g>
                 </symbol>
         </svg>
-        <svg className = {classModule}>
+        <svg onClick = {onClick} className = {classModule}>
             <use xlinkHref='#like-icon'></use>
         </svg>
     </>

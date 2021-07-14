@@ -1,0 +1,101 @@
+@use "../../styles/vars" as vars;
+
+.videoInfo {
+    width: 100%;
+    color: vars.$primary;
+    position: relative;
+    top: -4px;
+    &__container {
+        border-bottom: 1px solid rgba($color: black, $alpha: 0.1);
+        border-top: 1px solid rgba($color: black, $alpha: 0.1);
+        width: 100%;
+        padding: 20px 0;
+    }
+    &__top {
+        width: 100%;
+        position: relative;
+        display: flex;
+    }
+    &__text {
+        min-height: 100px;
+        max-height: 100px;
+        max-width: calc(100% - 140px);
+        margin: 20px 0 0 64px;
+        white-space: pre-wrap;
+        overflow: hidden;
+        line-height: 2rem;
+        letter-spacing: .2px;
+        &_active {
+            max-height: none;
+        }
+    }
+    &__bottom {
+        padding: 5px 0 0;
+        text-transform: uppercase;
+        font-size: 13px;
+        color: vars.$secondary;
+        font-weight: 500;
+        letter-spacing: 0.007px;
+        margin: 0 0 0 64px;
+        cursor: pointer;
+    }
+    &__button {
+        position: absolute;
+        right: 0;
+        &_active {
+            button {
+                background-color:   rgba($color: vars.$secondary, $alpha: 0.1)   !important;
+                color: vars.$secondary !important;
+            }
+        }
+        button {
+            color:white;
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 10px 16px;
+            background-color: #CC0000;
+        }
+    }
+}
+
+
+.card {
+    display: flex;
+    &__body {
+        padding: 0 0 0 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        overflow: hidden;
+    }
+    &__img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        min-width: 48px;
+        max-width: 48px;
+        min-height: 48px;
+        max-height: 48px;
+        cursor: pointer;
+        img {
+            border-radius: 50%;
+        }
+        border-radius: 50%;
+    }
+    &__nickname {
+        max-width: 500px;
+        font-weight: 500;
+        cursor: pointer;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+    &__sub {
+        color:vars.$secondary;
+        font-size: 12px;
+        letter-spacing: .3px;
+        line-height: 1.8rem;
+    }
+}

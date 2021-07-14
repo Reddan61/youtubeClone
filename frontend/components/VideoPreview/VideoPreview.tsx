@@ -6,7 +6,7 @@ import {convertTitle} from "../../assets/functions/convertVideoTitlePreview"
 import {CSSTransition} from "react-transition-group"
 import ClockIcon from '../svg/ClockIcon'
 import Router from 'next/router'
-import { converCountViewers } from '../../assets/functions/converCountViewers'
+import { converCount } from '../../assets/functions/converCount'
 
 interface IProps {
     little?:boolean,
@@ -17,6 +17,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
     const hoverRef = useRef<HTMLDivElement>(null);
     const [currentImg,setCurrentImg] = useState(null)
     const [titleSymbol,setTitleSymbol] = useState(undefined);
+    const [isImagesReady,setImagesReady] = useState(false)
     const arrImgSrc = ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"]
     const titleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has";
     // const titleText = "фффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффф";
@@ -27,7 +28,6 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
     //Кол-во символов для title
     const symbolNumberTitle = useCallback(() => {
         const windowSize = window.innerWidth
-
         if(little && !list) {
             setTitleSymbol(21)
         } else if(!little && list) {
@@ -43,7 +43,24 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
     const clickOnVideo = () => {
         Router.push(`/video/${1}`)
     }
+    //preload images
+    useEffect(() => {
+        let promises = [];
+        arrImgSrc.forEach(picture => {
+            promises.push(new Promise<void>((resolve,reject) => {
+                const img = new window.Image()
+                img.onload = () => {
+                    resolve()
+                }
+                img.src = picture
+            }))
+        })
+        Promise.all(promises).then(() => {       
+            setImagesReady(true)
+        })
+    },[])
 
+    //Изменение кол-ва символов в title
     useEffect(() => {
         symbolNumberTitle();
         window.addEventListener('resize',symbolNumberTitle)
@@ -70,7 +87,9 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
             if(imgTimeout !== null) {
                 return
             }
-            hoverHandler();
+            if(isImagesReady) {
+                hoverHandler();
+            }
         }
         hoverRef.current.onmouseleave = () => {
             currentIndex = 0;
@@ -78,11 +97,12 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
             clearTimeout(imgTimeout) 
             imgTimeout = null;
         }
-    },[])
+    },[isImagesReady])
+
     return <div onClick = {clickOnVideo} className = {`${classes.videoPreview} ${little && classes.videoPreview_little} ${list && classes.videoPreview_list}`}>
         <div className = {classes.videoPreview__container}>
             <div className = {classes.videoPreview__videoImage} ref = {hoverRef}>
-                <CSSTransition in = {currentImg === null} timeout = {500} unmountOnExit
+                <CSSTransition in = {currentImg === null} timeout = {300} unmountOnExit
                         classNames = {{
                             enter: classes.animation__enter,
                             enterActive: classes.animation__enter_active,
@@ -95,18 +115,11 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                     </>
                 </CSSTransition>
                 {arrImgSrc.map((el,index) => {
-                    return <CSSTransition  key = {index} in = {arrImgSrc[index] === currentImg} timeout = {500} unmountOnExit
-                        classNames = {{
-                            enter: classes.animation__enter,
-                            enterActive: classes.animation__enter_active,
-                            exit: classes.animation__exit,
-                            exitActive: classes.animation__exit_active
-                        }}
-                    > 
-                        <div className = {classes.image}>
-                            <Image className = {classes.image__img} src = {el} layout = {"fill"}  />
-                        </div>
-                    </CSSTransition>
+                    return <div key = {index} style = {{
+                        visibility: arrImgSrc[index] === currentImg ? "visible" : "hidden"
+                    }} className = {classes.image}>
+                        <img className = {classes.image__img} src = {el} width = {"100%"}  />
+                    </div>
                 })}
                 <div className = {classes.videoPreview__time}>{time}</div>
                 <div className = {classes.videoPreview__later}>
@@ -125,7 +138,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                         <span className = {`showTitle`}>{convertTitle(titleText,titleSymbol)}</span>
                     </div>
                     {list && <div className = {classes.videoPreview__viewers}>
-                        <span className = {classes.videoPreview__viewersCount}>{converCountViewers(viewersCount)}</span>
+                        <span className = {classes.videoPreview__viewersCount}>{converCount(viewersCount)}</span>
                         <div className = {classes.videoPreview__dot}></div>
                         <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
                     </div>}
@@ -138,7 +151,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                         <span className = {`showTitle`}>{nickaname}</span>
                     </div>
                     {!list && <div className = {classes.videoPreview__viewers}>
-                        <span className = {classes.videoPreview__viewersCount}>{converCountViewers(viewersCount)}</span>
+                        <span className = {classes.videoPreview__viewersCount}>{converCount(viewersCount)}</span>
                         <div className = {classes.videoPreview__dot}></div>
                         <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
                     </div>}

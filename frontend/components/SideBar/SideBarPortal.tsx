@@ -44,7 +44,7 @@ const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPorta
                     exitActive:classes.animationRoot__exit_active
                 }}
             >
-            <div className = {classes.sideBar}>
+            <div onClick = {burgerHandler} className = {classes.sideBar}>
             <CSSTransition in = {startAnimation} timeout = {300}
                 unmountOnExit
                 appear  ={true}
@@ -55,7 +55,7 @@ const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPorta
                     exitActive:classes.animationContainer__exit_active
                 }}
                 >
-                <div className = {classes.sideBar__container}>
+                <div onClick = {(e) => e.stopPropagation()}className = {classes.sideBar__container}>
                     <div className = {classes.list}>
                         <div className = {classes.sideBar__top}>
                             <div className = {classes.burger} onClick = {burgerHandler}>

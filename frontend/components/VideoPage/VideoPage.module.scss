@@ -17,7 +17,69 @@
         min-height: calc(100vh - #{vars.$headerHeight} - 20px);
     }
     &__left {
-       
+        width: 1200px;
+    }
+    &__info {
+        padding: 10px 0 0;
+    }
+    &__title {
+        display: flex;
+        max-width: 100%;
+        font-size: 18px;
+        line-height: 2.6rem;
+        color: vars.$primary;
+        h1 {
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+    &__subInfo {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+    &__add {
+        display: flex;
+        align-items: center;
+        gap:20px;
+    }
+}
+
+
+.subInfo {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 14px;
+    line-height: 2rem;
+    color: vars.$secondary;
+    letter-spacing: .2px;
+    font-weight: 400;
+    align-self: flex-start;
+    &__dot {
+        padding: 2px 5px 0;
+        div {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: vars.$secondary;
+        }
+        
+    }
+}
+
+
+.send {
+    width: 100%;
+    &__image {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        img {
+            border-radius: 50%;
+        }
     }
 }
 
