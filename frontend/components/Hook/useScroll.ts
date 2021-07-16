@@ -20,6 +20,7 @@ export const useScroll = () => {
             requestRef.current = true;
             setLoading(true)
             //Должно после ответа api = false
+            //Сделать что если на сервере нет больше контента то isloading всегда false
             setTimeout(() => {
                 requestRef.current = false;
                 setLoading(false)

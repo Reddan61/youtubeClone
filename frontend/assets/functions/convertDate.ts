@@ -7,6 +7,9 @@ export function convertDate(date:Date) {
     function convertYear(month:number) {
         return Math.floor(month/12)
     }
+    if(days < 1) {
+        return "сегодня"
+    }
     if(days === 1) {
         return "1 день назад"
     }

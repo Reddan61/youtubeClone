@@ -11,13 +11,17 @@
         align-items: flex-start;
         padding: 20px 0 0;
     }
-    &__right {
-        margin: 0 0 0 20px;
-        width: 450px;
-        min-height: calc(100vh - #{vars.$headerHeight} - 20px);
-    }
     &__left {
         width: 1200px;
+        @media (max-width:1230px) {
+            width: 1000px;
+        }
+        @media (max-width:1000px) {
+            width: 800px;
+        }
+        @media (max-width:800px) {
+            width:100%;
+        }
     }
     &__info {
         padding: 10px 0 0;
@@ -39,11 +43,27 @@
         display: flex;
         justify-content: space-between;
         width: 100%;
+        @media (max-width:600px) {
+            flex-direction: column;
+        }
     }
     &__add {
         display: flex;
         align-items: center;
         gap:20px;
+    }
+    &__comments {
+        padding: 20px 0;
+    }
+    &__bottom {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    &__loader {
+        width: 50px;
+        height: 50px;
     }
 }
 
@@ -72,7 +92,52 @@
 
 
 .send {
+    padding: 20px 0 0;
     width: 100%;
+    display: flex;
+    align-items: flex-start;
+    &__body {
+        width: 100%;
+        padding: 0 0 0 10px;
+    }
+    &__textarea {
+        textarea {
+            width: 100%;
+            resize: none;
+            border-bottom: 1px solid rgba($color: black, $alpha: 0.1);
+            background-color: #f9f9f9;
+            letter-spacing: .2px;
+            height: 22px;
+            overflow: hidden;
+            &:focus {
+                border-bottom: 2px solid rgba($color: black, $alpha: 1.0);
+            }
+        }
+    }
+    &__buttons {
+       display: flex;
+       width: 100%;
+       justify-content: flex-end;
+       padding:5px 0 0;
+        button {
+            text-transform: uppercase;
+            font-weight: 500;
+            padding: 10px 16px;
+            background-color: #f9f9f9;
+        }
+    }
+    &__cancel {
+        color:vars.$secondary;
+    }
+
+    &__submit {
+        color:vars.$secondary;
+        background-color:   rgba($color: vars.$secondary, $alpha: 0.1)   !important;
+        &:not([disabled]) {
+            color:white;
+            background-color:   rgba($color: #065fd4, $alpha: 1.0)   !important;
+        }
+    }
     &__image {
         width: 40px;
         height: 40px;

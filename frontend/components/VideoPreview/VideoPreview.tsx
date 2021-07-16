@@ -70,6 +70,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
     },[])
     //hover эффект
     useEffect(() => {
+        let hoverTimeout : ReturnType<typeof setTimeout> = null;
         let imgTimeout : ReturnType<typeof setTimeout> = null;
         let currentIndex = 0;
         const hoverHandler = () => {
@@ -84,14 +85,17 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
             },5000)
         }
         hoverRef.current.onmouseenter = () => {
-            if(imgTimeout !== null) {
-                return
-            }
-            if(isImagesReady) {
-                hoverHandler();
-            }
+            hoverTimeout = setTimeout(() => {
+                if(imgTimeout !== null) {
+                    return
+                }
+                if(isImagesReady) {
+                    hoverHandler();
+                }
+            },2000)
         }
         hoverRef.current.onmouseleave = () => {
+            clearTimeout(hoverTimeout)
             currentIndex = 0;
             setCurrentImg(null)
             clearTimeout(imgTimeout) 

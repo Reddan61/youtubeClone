@@ -54,7 +54,7 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
     </div>
     <div className = {classes.sideBarContent__addedList}>
         <ul className = {`${classes.list} ${!isPortal && classes.list_notPortal}`}>
-            <li className = {`${classes.list__item}`}>
+            <li onClick = {() => redirect("/history")} className = {`${classes.list__item} ${path === "history" && classes.list__item_active}`}>
                 <HistoryIcon classModule = {`${classes.icon} ${!isPortal && classes.icon_notPortal}`}/>
                 <span className = {`showTitle`}>История</span>
             </li>

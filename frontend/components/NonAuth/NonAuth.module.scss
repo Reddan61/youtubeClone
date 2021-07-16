@@ -1,0 +1,31 @@
+@use "../../styles/vars" as vars;
+
+.nonAuth {
+    width: 100%;
+    &__container {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: column;
+        padding: 100px 0 0;
+        min-height: calc(100vh - #{vars.$headerHeight});
+        background-color: #f9f9f9;
+    }
+    &__title {
+        font-size: 24px;
+        margin: 24px 0 0;
+        text-align: center;
+    }
+    &__text {
+        margin: 16px 0 0;
+        text-align: center;
+    }
+    &__button {
+        margin: 24px 0 0;
+    }
+    &__icon {
+        fill: vars.$secondary;
+    }
+}
+

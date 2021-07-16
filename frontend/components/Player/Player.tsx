@@ -83,9 +83,17 @@ const Player:React.FC<IProps> = ({src}) => {
         setVisibleControls(true)
         
     }
+    //калькулятор высоты 16:9
+    const calculateHeight = useCallback(() => {
+        const video = videoRef.current
+        const width = video.offsetWidth
+        const height = width / 1.78 
+        video.style.height = height + "px" 
+    },[])
 
     useEffect(() => {
         const video = videoRef.current
+        calculateHeight()
         let interval = setInterval(() => {
             if(video.readyState > 0) {
                 initializeVideo()
@@ -96,11 +104,13 @@ const Player:React.FC<IProps> = ({src}) => {
         video.addEventListener("loadedmetadata",initializeVideo);
         video.addEventListener("ended",endedVideo);
         video.addEventListener("timeupdate",timeUpdateVideo);
+        window.addEventListener('resize',calculateHeight)
         return () => {
             video.removeEventListener("click",togglePlay);
             video.removeEventListener("loadedmetadata",initializeVideo);
             video.removeEventListener("ended",endedVideo);
             video.removeEventListener("timeupdate",timeUpdateVideo);
+            window.removeEventListener('resize',calculateHeight)
         }
     },[])
     

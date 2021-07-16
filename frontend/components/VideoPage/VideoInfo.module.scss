@@ -91,6 +91,12 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+        @media (max-width:800px) {
+            max-width:300px;
+        }
+        @media (max-width:500px) {
+            max-width:150px;
+        }
     }
     &__sub {
         color:vars.$secondary;

@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import classes from "./VideoPage.module.scss"
 import Player from "../Player/Player";
 import Rating from "../Rating/Rating";
 import Save from "../Save/Save";
 import VideoInfo from "./VideoInfo";
+import Comment from "../Comment/Comment";
+import { useScroll } from "../Hook/useScroll";
+import LoaderIcon from "../svg/LoaderIcon";
 
 const VideoPage = () => {
     const [isAuth,setAuth] = useState(true)
+    const [textAreaText,setTextAreaText] = useState("")
+    const [showButtons,setShowButtons] = useState(false)
+
+    const [isLoading] = useScroll();
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
 
     const convertViewers = (count:number) => {
         const countStr = String(count)
@@ -29,6 +37,25 @@ const VideoPage = () => {
         
         return `${date.getDate()} ${monthArr[date.getMonth()]}. ${date.getFullYear()} г.`
     }
+
+    const textAreaChange = (e:SyntheticEvent<HTMLTextAreaElement>) => {
+        const target = e.target as HTMLTextAreaElement
+        const textArea = textareaRef.current
+        
+        if(textArea.scrollTop > 0){
+            textArea.style.height = textArea.scrollHeight + "px";
+        } else {
+            textArea.style.height = 22 + "px"
+        }
+
+        setTextAreaText(target.value)
+    }
+
+    const sendTextArea = () => {
+        console.log('sended');
+        
+    }
+
     return <div className = {classes.videoPage}>
         <div className = {classes.videoPage__container}>
             <div className = {classes.videoPage__left}>
@@ -59,24 +86,35 @@ const VideoPage = () => {
                         </div>
                         <div className = {classes.send__body}>
                             <div className = {classes.send__textarea}>
-                                <textarea></textarea>
+                                <textarea onFocus = {() => {
+                                    setShowButtons(true)
+                                }} ref = {textareaRef} onChange = {textAreaChange} placeholder = {"Оставьте сообщение"} value = {textAreaText} />
                             </div>
-                            <div className = {classes.send__buttons}>
-                                <button>Отмена</button>
-                                <button>Оставить комментарий</button>
-                            </div>
+                            {showButtons && 
+                                <div className = {classes.send__buttons}>
+                                    <button onClick = {() => {
+                                        setTextAreaText("")
+                                        setShowButtons(false)
+                                    }}className = {classes.send__cancel}>Отмена</button>
+                                    <button onClick = {sendTextArea} disabled = {textAreaText.length === 0} className = {classes.send__submit}>Оставить комментарий</button>
+                                </div>
+                            }               
                         </div>
                     </div>
                 }
                 <div className = {classes.videoPage__comments}>
-                    comments
+                    <Comment />
                 </div>
             </div>
-            <div className = {classes.videoPage__right}>
-                right
-            </div>
+        </div>
+        <div className = {classes.videoPage__bottom}>
+            {isLoading && 
+                <LoaderIcon classModule = {classes.videoPage__loader}/>
+            }
         </div>
     </div>
 }
+
+
 
 export default VideoPage;

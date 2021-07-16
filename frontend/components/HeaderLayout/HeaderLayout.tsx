@@ -81,7 +81,7 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                             <UploadIcon classModule = {classes.icon__upload}/>
                             <Image className ={classes.right__image} src = {"/imgTest.jpg"} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
                         </>
-                        : <div className = {classes.right__auth} onClick = {() => router.push('/login')}>
+                        : <div className = {classes.right__auth}>
                             <AuthButton />
                         </div>
                     }
