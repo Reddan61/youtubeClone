@@ -6,18 +6,20 @@ import {convertTitle} from "../../assets/functions/convertVideoTitlePreview"
 import {CSSTransition} from "react-transition-group"
 import ClockIcon from '../svg/ClockIcon'
 import Router from 'next/router'
-import { converCount } from '../../assets/functions/converCount'
+import { convertCount } from '../../assets/functions/convertCount'
 
 interface IProps {
     little?:boolean,
     list?:boolean,
+    hideUsername?:boolean
 }
 
-const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
+const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername = false}) => {
     const hoverRef = useRef<HTMLDivElement>(null);
     const [currentImg,setCurrentImg] = useState(null)
     const [titleSymbol,setTitleSymbol] = useState(undefined);
     const [isImagesReady,setImagesReady] = useState(false)
+    const userId = "1"
     const arrImgSrc = ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"]
     const titleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has";
     // const titleText = "фффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффф";
@@ -118,6 +120,8 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                         <Image src = {"/imgTest.jpg"} className = {classes.videoPreview__preview} layout = {"fill"}  />
                     </>
                 </CSSTransition>
+
+                {/* Слайдер */}
                 {arrImgSrc.map((el,index) => {
                     return <div key = {index} style = {{
                         visibility: arrImgSrc[index] === currentImg ? "visible" : "hidden"
@@ -125,6 +129,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
                         <img className = {classes.image__img} src = {el} width = {"100%"}  />
                     </div>
                 })}
+                
                 <div className = {classes.videoPreview__time}>{time}</div>
                 <div className = {classes.videoPreview__later}>
                     <ClockIcon classModule = {classes.icon__clock}/>
@@ -132,33 +137,45 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false}) => {
             </div>
             <div className = {classes.videoPreview__info}>
                 {!little && !list &&
-                <div className = {classes.videoPreview__avatar_div}>
-                    <Image layout = {'fixed'} className = {classes.videoPreview__avatar} src = {"/imgTest.jpg"} width = {35} height = {35}/>
-                </div>
+                    <div onClick = {(e) => {
+                        e.stopPropagation()
+                        Router.push(`/profile/${userId}`)}} className = {classes.videoPreview__avatar_div}>
+                        <Image layout = {'fixed'} className = {classes.videoPreview__avatar} src = {"/imgTest.jpg"} width = {35} height = {35}/>
+                    </div>
                 }
                 
                 <div className = {classes.videoPreview__bottomInfo}>
                     <div className = {classes.videoPreview__title}>
                         <span className = {`showTitle`}>{convertTitle(titleText,titleSymbol)}</span>
                     </div>
-                    {list && <div className = {classes.videoPreview__viewers}>
-                        <span className = {classes.videoPreview__viewersCount}>{converCount(viewersCount)}</span>
-                        <div className = {classes.videoPreview__dot}></div>
-                        <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
-                    </div>}
-                    <div className = {classes.videoPreview__username}>
+
                     {list && 
-                        <div className = {classes.videoPreview__avatar_div}>
-                            <Image layout = {'fixed'} className = {classes.videoPreview__avatar} src = {"/imgTest.jpg"} width = {24} height = {24}/>
+                        <div className = {classes.videoPreview__viewers}>
+                            <span className = {classes.videoPreview__viewersCount}>{convertCount(viewersCount)}</span>
+                            <div className = {classes.videoPreview__dot}></div>
+                            <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
                         </div>
                     }
-                        <span className = {`showTitle`}>{nickaname}</span>
-                    </div>
-                    {!list && <div className = {classes.videoPreview__viewers}>
-                        <span className = {classes.videoPreview__viewersCount}>{converCount(viewersCount)}</span>
-                        <div className = {classes.videoPreview__dot}></div>
-                        <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
-                    </div>}
+
+                   { !hideUsername && 
+                    <div className = {classes.videoPreview__username}>
+                        {list && 
+                            <div onClick = {(e) => {
+                                e.stopPropagation()
+                                Router.push(`/profile/${userId}`)}} className = {classes.videoPreview__avatar_div}>
+                                <Image layout = {'fixed'} className = {classes.videoPreview__avatar} src = {"/imgTest.jpg"} width = {24} height = {24}/>
+                            </div>
+                        }
+                            <span className = {`showTitle`}>{nickaname}</span>
+                        </div>
+                    }
+                    {!list && 
+                        <div className = {classes.videoPreview__viewers}>
+                            <span className = {classes.videoPreview__viewersCount}>{convertCount(viewersCount)}</span>
+                            <div className = {classes.videoPreview__dot}></div>
+                            <span className = {classes.videoPreview__date}>{convertDate(date)}</span>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

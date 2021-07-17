@@ -1,3 +1,4 @@
+import Router from "next/router";
 import React, { useState } from "react";
 import { convertDate } from "../../assets/functions/convertDate";
 import { convertNumbers } from "../../assets/functions/convertRating";
@@ -8,7 +9,7 @@ import classes from "./Comment.module.scss"
 
 const Comment = () => {
     const [rating,setRating] = useState(0)
-
+    const userId = "1"
     const clickHandler = (rating:number) => {
         setRating(state => {
             if(state === rating) {
@@ -20,12 +21,12 @@ const Comment = () => {
 
     return <div className = {classes.comment}>
         <div className = {classes.comment__container}>
-            <div className = {classes.comment__image}>
+            <div onClick = {() => Router.push(`/profile/${userId}`)} className = {classes.comment__image}>
                 <img src={"/imgTest.jpg"} alt={"avatar"} width = {"100%"} height = {"100%"}/>
             </div>
             <div className = {classes.comment__body}>
                 <div className = {classes.comment__author}>
-                    <span className = {classes.comment__nickname}>
+                    <span onClick = {() => Router.push(`/profile/${userId}`)} className = {classes.comment__nickname}>
                         nickname
                     </span>
                     <span className = {classes.comment__date}>

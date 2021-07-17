@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import classes from "./VideoInfo.module.scss"
 import Image from 'next/image'
-import { converCount } from "../../assets/functions/converCount";
+import { convertCount } from "../../assets/functions/convertCount";
+import Router from "next/router";
 
 const VideoInfo = () => {
     const [isAuth,setAuth] = useState(true)
     const [isSub,setSub] = useState(false)
     const [isOpenText,setOpenText] = useState(false)
-
+    const userId = "1"
     const subHandler = () => {
         setSub(!isSub)
     }
@@ -16,15 +17,15 @@ const VideoInfo = () => {
         <div className = {classes.videoInfo__container}>
             <div className = {classes.videoInfo__top}>
                 <div className = {classes.card}>
-                    <div className = {classes.card__img}>
+                    <div onClick = {() => Router.push(`/profile/${userId}`)} className = {classes.card__img}>
                         <img src = {"/imgTest.jpg"} width = {'100%'} height = {"100%"}/>
                     </div>
                     <div className = {classes.card__body}>
-                        <div className = {classes.card__nickname}>
+                        <div onClick = {() => Router.push(`/profile/${userId}`)} className = {classes.card__nickname}>
                             Dolor do cupidatat cupidatat Lorem ullamco ea id. Nisi esse ullamco sunt eiusmod minim et. Labore voluptate reprehenderit laborum sint aute aliqua velit laboris ex nisi Lorem esse. Est aliqua labore consectetur laboris reprehenderit dolor consectetur qui commodo magna duis. Nulla magna irure Lorem dolor est minim tempor. Nisi sit exercitation nisi aliqua adipisicing aliqua irure. Irure ad do reprehenderit et ex elit culpa do occaecat do commodo.
                         </div>
                         <div className = {classes.card__sub}>
-                            {converCount(150000,true)}
+                            {convertCount(150000,true)}
                         </div>
                     </div>
                 </div>

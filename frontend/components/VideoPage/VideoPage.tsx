@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
+import React, { SyntheticEvent, useRef, useState } from "react";
 import classes from "./VideoPage.module.scss"
 import Player from "../Player/Player";
 import Rating from "../Rating/Rating";
@@ -12,7 +12,6 @@ const VideoPage = () => {
     const [isAuth,setAuth] = useState(true)
     const [textAreaText,setTextAreaText] = useState("")
     const [showButtons,setShowButtons] = useState(false)
-
     const [isLoading] = useScroll();
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 

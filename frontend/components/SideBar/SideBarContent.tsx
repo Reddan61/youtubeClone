@@ -60,11 +60,11 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
             </li>
             {
                 isAuth && <>
-                    <li className = {`${classes.list__item}`}>
+                    <li  onClick = {() => redirect("/later")} className = {`${classes.list__item} ${path === "later" && classes.list__item_active}`}>
                         <ClockIcon classModule = {`${classes.icon} ${!isPortal && classes.icon_notPortal}`}/>
                         <span className = {`showTitle`}>Смотреть позже</span>
                     </li>
-                    <li className = {`${classes.list__item}`}>
+                    <li onClick = {() => redirect("/liked")} className = {`${classes.list__item} ${path === "liked" && classes.list__item_active}`}>
                         <LikeIcon classModule = {`${classes.icon} ${!isPortal && classes.icon_notPortal}`}/>
                         <span className = {`showTitle`}>Понравившиеся</span>
                     </li>

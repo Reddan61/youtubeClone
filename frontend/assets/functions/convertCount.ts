@@ -1,4 +1,4 @@
-export function converCount(count:number,isSub = false) {
+export function convertCount(count:number,isSub = false) {
     let viewArr = ["просмотров","просмотр","просмотра"]
     let subArr = ["подписчиков","подписчик","подписчика"]
     let exampleArr = isSub ? [...subArr] : [...viewArr]
