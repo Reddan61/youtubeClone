@@ -1,6 +1,6 @@
 import { Iprops } from "./svgInterfaces";
 
-const UploadIcon:React.FC<Iprops> = ({classModule}) => {
+const UploadIcon:React.FC<Iprops> = ({classModule,onClick}) => {
     return <>
         <svg display = 'none'>
                 <symbol viewBox="0 0 512 512" id = "upload-icon">
@@ -18,7 +18,7 @@ const UploadIcon:React.FC<Iprops> = ({classModule}) => {
                     </g>
                 </symbol>
         </svg>
-        <svg className = {classModule}>
+        <svg onClick = {onClick} className = {classModule}>
             <use xlinkHref='#upload-icon'></use>
         </svg>
     </>

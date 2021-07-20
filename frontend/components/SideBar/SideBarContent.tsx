@@ -84,24 +84,8 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
             </div>
             <div >
                 <ul className = {classes.list}>
-                    <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
-                        <span className = {`showTitle`}>названиеaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
-                    </li>
-                    <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"}width = {25} height = {25}/>
-                        <span className = {`showTitle`}>названиеaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
-                    </li>
-                    <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"}width = {25} height = {25}/>
-                        <span className = {`showTitle`}>название</span>
-                    </li>
-                    <li className = {`${classes.list__item}`}>
-                        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
-                        <span className = {`showTitle`}>название</span>
-                    </li>
-                    
-            
+                    <SubscribeItem />
+                    <SubscribeItem />
                 </ul>
             </div>
             <div onClick = {subListHandler} className = {classes.subscribers__button}>
@@ -124,6 +108,14 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
         </div>
     </>}
 </div>
+}
+
+const SubscribeItem = () => {
+    const id = "1"
+    return <li onClick = {() => Router.push(`/profile/${id}`)} className = {`${classes.list__item}`}>
+        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
+        <span className = {`showTitle`}>название</span>
+    </li>
 }
 
 

@@ -1,6 +1,6 @@
 import { Iprops } from "./svgInterfaces";
 
-const CrossIcon:React.FC<Iprops> = ({classModule,onClick}) => {
+const CrossIcon:React.FC<Iprops> = ({classModule,...props}) => {
     return <>
         <svg display = 'none'>
                 <symbol viewBox="0 0 24 24" id = "cross-icon">
@@ -10,7 +10,7 @@ const CrossIcon:React.FC<Iprops> = ({classModule,onClick}) => {
                     </g>
                 </symbol>
         </svg>
-        <svg onClick = {onClick} className = {classModule}>
+        <svg {...props} className = {classModule}>
             <use xlinkHref='#cross-icon'></use>
         </svg>
     </>

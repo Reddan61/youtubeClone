@@ -7,7 +7,8 @@ import React, {useEffect, useState } from 'react';
 import AuthButton from '../AuthButton/AuthButton';
 import ArrowBackIcon from '../svg/ArrowBackIcon';
 import Burger from '../Burger/Burger';
-import { useRouter } from "next/router"
+import { Router, useRouter } from "next/router"
+import UploadVideo from '../UploadVideo/UploadVideo';
 
 interface IProps {
     onlyPortal?:boolean,
@@ -19,8 +20,9 @@ interface IProps {
 const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarPortal,onlyPortal}) => {
     const [isAuth,setAuth] = useState(true)
     const router = useRouter()
-    
+    const userId = "1"
     const [searchText,setSearchText] = useState('')
+    const [isPopUp,setPopUp] = useState(false)
     //Отправка на api get search
     const sendSearch = () => {
         if(searchText.trim().length !== 0) {
@@ -78,8 +80,8 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                     </label>
                     {
                         isAuth ? <>
-                            <UploadIcon classModule = {classes.icon__upload}/>
-                            <Image className ={classes.right__image} src = {"/imgTest.jpg"} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
+                            <UploadIcon onClick = {() => setPopUp(true)} classModule = {classes.icon__upload}/>
+                            <Image onClick = {() => router.push(`/profile/${userId}`)} className ={classes.right__image} src = {"/imgTest.jpg"} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
                         </>
                         : <div className = {classes.right__auth}>
                             <AuthButton />
@@ -87,7 +89,9 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                     }
                 </div>
             </div>
-            
+            { isPopUp && 
+                <UploadVideo setPopUp = {setPopUp}/>
+            }
         </nav>
         <main className = {classes.main}>
             {children}
