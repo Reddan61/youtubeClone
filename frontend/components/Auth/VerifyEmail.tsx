@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BlueButton from "../Buttons/BlueButton/BlueButton";
 import LinkButton from "../Buttons/LinkButton/LinkButton";
 import Input from "../Formik/Input";
@@ -13,15 +13,12 @@ const VerifyEmail = () => {
     const email = "Random@mail.ru"
     const [startAnimation, setStartAnimation] = useState(true);
     const [isLoading, setLoading] = useState(false)
-
+    
     const linkButtonHandler = () => {
         setLoading(true)
         setTimeout(() => {
             setLoading(false)
             setStartAnimation(false);
-            setTimeout(() => {
-                Router.push("/register")
-            }, 300)
         }, 1000)
     }
 
@@ -46,6 +43,11 @@ const VerifyEmail = () => {
                         appearActive: classes.animation__appear_active,
                         exit: classes.animation__exit,
                         exitActive: classes.animation__exit_active,
+                    }}
+                    onExited = {() => {
+                        if(!startAnimation) {
+                            Router.push("/register")
+                        }
                     }}
                     unmountOnExit
                 >

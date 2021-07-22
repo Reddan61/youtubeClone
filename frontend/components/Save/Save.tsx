@@ -6,10 +6,11 @@ import CrossIcon from "../svg/СrossIcon";
 import classes from "./Save.module.scss"
 
 interface IProps {
-    id:string
+    id:string,
+    isSaved?:boolean
 }
 
-const Save:React.FC<IProps> = ({id}) => {
+const Save:React.FC<IProps> = ({id,isSaved = false}) => {
     const [isOpen,setOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
     
@@ -43,7 +44,7 @@ const Save:React.FC<IProps> = ({id}) => {
                 <div className = {classes.popup__body}>
                     <ul>
                         <li>
-                            <CheckBox label = {"Смотреть позже"}/>
+                            <CheckBox isChecked = {isSaved} label = {"Смотреть позже"}/>
                         </li>
                     </ul>
                 </div>

@@ -7,22 +7,25 @@ import React, {useEffect, useState } from 'react';
 import AuthButton from '../AuthButton/AuthButton';
 import ArrowBackIcon from '../svg/ArrowBackIcon';
 import Burger from '../Burger/Burger';
-import { Router, useRouter } from "next/router"
+import { useRouter } from "next/router"
 import UploadVideo from '../UploadVideo/UploadVideo';
+import authReducer from "../../store/authReducer"
+import sideBarReducer from '../../store/sideBarReducer';
+import { observer } from 'mobx-react-lite';
+import { convertAvatarSrc } from '../../assets/functions/convertAvatarSrc';
+
 
 interface IProps {
-    onlyPortal?:boolean,
-    setOpenSideBar: (fun:(state:boolean)=>boolean) => void,
-    setOpenSideBarPortal: (fun:(state:boolean)=>boolean) => void,
+    onlyPortal?:boolean
 }
 
 
-const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarPortal,onlyPortal}) => {
-    const [isAuth,setAuth] = useState(true)
+const HeaderLayout:React.FC<IProps> = ({children,onlyPortal}) => {
     const router = useRouter()
-    const userId = "1"
+
     const [searchText,setSearchText] = useState('')
     const [isPopUp,setPopUp] = useState(false)
+
     //Отправка на api get search
     const sendSearch = () => {
         if(searchText.trim().length !== 0) {
@@ -32,17 +35,18 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
 
     function openSideBarHandler() {
         if(onlyPortal) {
-            setOpenSideBarPortal((prevState) => !prevState)
+            sideBarReducer.changeOpenSideBarPortal()
             return
         }
         if (window.innerWidth > 1000) {
-            setOpenSideBar((prevState) => !prevState)
+            sideBarReducer.changeOpenSideBar()
         } else {
-            setOpenSideBarPortal((prevState) => !prevState)
+            sideBarReducer.changeOpenSideBarPortal()
         }
     }
 
     useEffect(() => {
+        authReducer.initialUser()
         if(router.query.search_query) {
             setSearchText(router.query.search_query as string)
         }
@@ -79,9 +83,9 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
                         </div>
                     </label>
                     {
-                        isAuth ? <>
+                        authReducer.isAuth ? <>
                             <UploadIcon onClick = {() => setPopUp(true)} classModule = {classes.icon__upload}/>
-                            <Image onClick = {() => router.push(`/profile/${userId}`)} className ={classes.right__image} src = {"/imgTest.jpg"} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
+                            <Image onClick = {() => router.push(`/profile/${authReducer.user.id}`)} className ={classes.right__image} src = {convertAvatarSrc(authReducer.user.avatarSrc)} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
                         </>
                         : <div className = {classes.right__auth}>
                             <AuthButton />
@@ -99,4 +103,4 @@ const HeaderLayout:React.FC<IProps> = ({children, setOpenSideBar,setOpenSideBarP
     </div>
 }
 
-export default HeaderLayout;
+export default observer(HeaderLayout);

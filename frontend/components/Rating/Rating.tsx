@@ -6,13 +6,14 @@ import classes from "./Rating.module.scss"
 
 interface IProps {
     likes:number,
-    dislikes:number
+    dislikes:number,
+    rating?:number
 }
 
-const Rating:React.FC<IProps> = ({likes,dislikes}) => {
+const Rating:React.FC<IProps> = ({likes,dislikes,rating = 0}) => {
     const likesRef = useRef<HTMLDivElement>(null)
     const dislikesRef = useRef<HTMLDivElement>(null)
-    const [isLiked,setLike] = useState(0)
+    const [isLiked,setLike] = useState(rating)
 
    
     const clickHandler = (rating:number) => {

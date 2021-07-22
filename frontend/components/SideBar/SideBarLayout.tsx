@@ -2,28 +2,28 @@ import classes from "./sideBarLayout.module.scss";
 import React from "react";
 import SideBar from "./SideBar";
 import SideBarPortal from "./SideBarPortal";
+import { observer } from "mobx-react-lite";
+import sideBarReducer from "../../store/sideBarReducer"
 
 interface IProps {
-    isOpenSideBar:boolean,
-    isOpenSideBarPortal:boolean,
-    onlyPortal?:boolean,
-    setOpenSideBarPortal: (fun:(state:boolean) => boolean) => void
+    onlyPortal?:boolean
 }
 
-const SideBarLayout:React.FC<IProps> =({children,isOpenSideBar,setOpenSideBarPortal,isOpenSideBarPortal,onlyPortal}) => {
+const SideBarLayout:React.FC<IProps> =({children,onlyPortal = false}) => {
+    
     return <div className = {classes.root}>
-        {!onlyPortal && <SideBar isOpenSideBar = { isOpenSideBar }/>}
-        {isOpenSideBarPortal && 
-            <SideBarPortal setOpenSideBarPortal = {setOpenSideBarPortal}/>
+        {!onlyPortal && <SideBar />}
+        {sideBarReducer.isOpenSideBarPortal && 
+            <SideBarPortal/>
         }
         
         <main className = {classes.main}>
             {React.Children.map(children,(child) => {
-                return React.cloneElement(child as React.ReactElement<any>,{isOpenSideBar})
+                return React.cloneElement(child as React.ReactElement<any>,{isOpenSideBar:sideBarReducer.changeOpenSideBar})
             })}
         </main>
     </div>
 }
 
 
-export default SideBarLayout;
+export default observer(SideBarLayout)

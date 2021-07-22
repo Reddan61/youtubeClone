@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useRef, useState } from "react";
+import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import classes from "./VideoPage.module.scss"
 import Player from "../Player/Player";
 import Rating from "../Rating/Rating";
@@ -7,13 +7,20 @@ import VideoInfo from "./VideoInfo";
 import Comment from "../Comment/Comment";
 import { useScroll } from "../Hook/useScroll";
 import LoaderIcon from "../svg/LoaderIcon";
+import authReducer from "../../store/authReducer";
+import { observer } from "mobx-react-lite";
+import { convertAvatarSrc } from "../../assets/functions/convertAvatarSrc";
+import videoReducer, { IVideo } from "../../store/videoReducer";
 
-const VideoPage = () => {
-    const [isAuth,setAuth] = useState(true)
+
+const VideoPage:React.FC<IVideo> = (props) => {
     const [textAreaText,setTextAreaText] = useState("")
     const [showButtons,setShowButtons] = useState(false)
-    const [isLoading] = useScroll();
+    const [isBrowser,setIsBrowser] = useState(false)
+    const [isLoading] = useScroll(videoReducer.addComment.bind(videoReducer))
     const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+    const video = isBrowser ? videoReducer.video : props
 
     const convertViewers = (count:number) => {
         const countStr = String(count)
@@ -55,33 +62,38 @@ const VideoPage = () => {
         
     }
 
+    useEffect(() => {
+        videoReducer.setInitialState(props)
+        setIsBrowser(true)
+    },[])
+
     return <div className = {classes.videoPage}>
         <div className = {classes.videoPage__container}>
             <div className = {classes.videoPage__left}>
-                <Player src = {'/testvideo.mp4'} />
+                <Player src = {video.videoSrc} />
                 <div className = {classes.videoPage__info}>
                     <div className = {classes.videoPage__title}>
-                        <h1 >Commodo duis elit veniam pariatur minim nulla culpa proident dolor incididunt consequat occaecat cupidatat. Nulla culpa amet enim magna laboris officia esse pariatur est laboris et minim commodo officia. Ullamco aliqua consectetur id exercitation pariatur. Veniam ex quis exercitation aliquip ad voluptate dolore pariatur laborum sunt sunt. </h1>
+                        <h1>{video.title}</h1>
                     </div>
-                    <div className = {`${classes.videoPage__subInfo}`}>
+                    <div className = {classes.videoPage__subInfo}>
                         <div className = {classes.subInfo}>
-                            {convertViewers(1200000)}
+                            {convertViewers(video.countViewers)}
                             <div className = {classes.subInfo__dot}>
                                 <div></div>
                             </div>
-                            <span>{convertDate(new Date())}</span>
+                            <span>{convertDate(new Date(video.date))}</span>
                         </div>
                         <div className = {classes.videoPage__add}>
-                            <Rating likes = {1250} dislikes = {500} />
-                            <Save id = {"1"}/>
+                            <Rating rating = {video.rating.rating} likes = {video.rating.likes} dislikes = {video.rating.dislikes} />
+                            <Save id = {"1"} isSaved = {video.isSaved}/>
                         </div>
                     </div>
-                    <VideoInfo />
+                    <VideoInfo info = {video.subInfo}/>
                 </div>
-                {isAuth && 
+                {authReducer.isAuth && 
                     <div className = {classes.send}>
                         <div className = {classes.send__image}>
-                            <img src={"/imgTest.jpg"} alt="img" width = {"100%"} height = {"100%"}/>
+                            <img src={convertAvatarSrc(authReducer.user.avatarSrc)} alt="img" width = {"100%"} height = {"100%"}/>
                         </div>
                         <div className = {classes.send__body}>
                             <div className = {classes.send__textarea}>
@@ -102,7 +114,11 @@ const VideoPage = () => {
                     </div>
                 }
                 <div className = {classes.videoPage__comments}>
-                    <Comment />
+                    {
+                        video.comments.map(el => {
+                            return <Comment key = {el.text + el.userId + el.date} item = {el}/>
+                        })
+                    }
                 </div>
             </div>
         </div>
@@ -116,4 +132,4 @@ const VideoPage = () => {
 
 
 
-export default VideoPage;
+export default observer(VideoPage);

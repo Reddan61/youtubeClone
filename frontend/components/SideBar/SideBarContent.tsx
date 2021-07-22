@@ -8,24 +8,32 @@ import YouTubeListIcon from "../svg/YouTubeListIcon";
 import classes from "./SideBarContent.module.scss"
 import Image from 'next/image'
 import Router from "next/router"
+import authReducer from "../../store/authReducer"
+import sideBarReducer from "../../store/sideBarReducer"
+import { observer } from "mobx-react-lite";
+import { convertAvatarSrc } from "../../assets/functions/convertAvatarSrc";
 
 interface IProps {
-    isOpenSideBar?:boolean,
     isPortal?:boolean
 }
 
 
-const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false}) => {
-    const [isAuth,setAuth] = useState(true)
+const SideBarContent:React.FC<IProps> = ({isPortal = false}) => {
     const [path,setPath] = useState(null)
     const [isSubOpen,setIsSubOpen] = useState(false)
+    
     const urlParse = () => {
         const pathname = Router.pathname; 
         const parsedPath = pathname.slice(1,pathname.indexOf('/',1) !== -1 ?pathname.indexOf('/',1) : pathname.length );
 
         return parsedPath
     }
-    const subListHandler = () => {
+    const subListHandler = async () => {
+        if (!isSubOpen) {
+            await sideBarReducer.addSubscribers()
+        } else {
+            await sideBarReducer.getInitialSub()
+        }
         setIsSubOpen(!isSubOpen)
     }
     const redirect = (url:string) => {
@@ -33,9 +41,13 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
     }
 
     useEffect(() => {
+        (async function() {
+            await sideBarReducer.getInitialSub()
+        })()
+
         setPath(urlParse())
     },[])
-    return <div className = {`${classes.sideBarContent} ${isOpenSideBar && classes.sideBarContent_active} ${!isPortal && classes.sideBarContent_notPortal}`}>
+    return <div className = {`${classes.sideBarContent} ${sideBarReducer.isOpenSideBar && classes.sideBarContent_active} ${!isPortal && classes.sideBarContent_notPortal}`}>
     <div className = {classes.sideBarContent__activeList}>
         <ul className = {`${classes.list} ${!isPortal && classes.list_notPortal}`}>
             <li onClick = {() => {redirect("/")}} data-title = {"Главная"}
@@ -59,7 +71,7 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
                 <span className = {`showTitle`}>История</span>
             </li>
             {
-                isAuth && <>
+                authReducer.isAuth && <>
                     <li  onClick = {() => redirect("/later")} className = {`${classes.list__item} ${path === "later" && classes.list__item_active}`}>
                         <ClockIcon classModule = {`${classes.icon} ${!isPortal && classes.icon_notPortal}`}/>
                         <span className = {`showTitle`}>Смотреть позже</span>
@@ -76,7 +88,7 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
     <div className = {`${classes.sideBarContent__line} ${!isPortal && classes.sideBarContent__line_notPortal}`}>
         <div></div>
     </div>
-    {isAuth &&
+    {authReducer.isAuth &&
     <div className = {`${classes.sideBarContent__subscribers} ${!isPortal && classes.sideBarContent__subscribers_notPortal} ${classes.subscribers}`}>
         <div className = {classes.subscribers__container}>
             <div className = {classes.subscribers__title}>
@@ -84,18 +96,25 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
             </div>
             <div >
                 <ul className = {classes.list}>
-                    <SubscribeItem />
-                    <SubscribeItem />
+                    {
+                        sideBarReducer.subscribers.map(el => {
+                            return <SubscribeItem key = {el.userId}
+                                userdId = {el.userId} avatarSrc = {el.avatarSrc}
+                                nickname = {el.nickname} 
+                            />
+                        }
+                    )
+                    }
                 </ul>
             </div>
             <div onClick = {subListHandler} className = {classes.subscribers__button}>
                 <div className = {`${classes.arrow} ${isSubOpen && classes.arrow_active}`}></div>
-                <span className = {`showTitle`}>{isSubOpen ? "Свернуть" : "Показать еще 15 каналов"}</span>
+                <span className = {`showTitle`}>{isSubOpen ? "Свернуть" : `Показать еще ${sideBarReducer.moreCountSub} каналов`}</span>
             </div>
         </div>
     </div>
     }
-    {!isAuth && !isOpenSideBar && <>
+    {!authReducer.isAuth && !sideBarReducer.isOpenSideBar && <>
         <div className = {`${classes.sideBarContent__auth} ${!isPortal && classes.sideBarContent__auth_notPortal}`}>
             <span>
                 Вы сможете ставить отметки 
@@ -110,13 +129,21 @@ const SideBarContent:React.FC<IProps> = ({isOpenSideBar = false,isPortal = false
 </div>
 }
 
-const SubscribeItem = () => {
-    const id = "1"
-    return <li onClick = {() => Router.push(`/profile/${id}`)} className = {`${classes.list__item}`}>
-        <Image className = {classes.subscribers__image} src = {"/imgTest.jpg"} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
-        <span className = {`showTitle`}>название</span>
+interface ISiberBarItemProps {
+    userdId:string,
+    avatarSrc:string,
+    nickname:string
+}
+
+const SubscribeItem:React.FC<ISiberBarItemProps> = ({userdId,avatarSrc,nickname}) => {
+
+    return <li onClick = {() => Router.push(`/profile/${userdId}`)} className = {`${classes.list__item}`}>
+        <Image className = {classes.subscribers__image} src = {convertAvatarSrc(avatarSrc)} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
+        <span className = {`showTitle`}>{nickname}</span>
     </li>
 }
 
 
-export default SideBarContent;
+
+
+export default observer(SideBarContent)

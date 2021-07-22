@@ -14,6 +14,7 @@ import ProgressBar from "../ProgressBar/ProgressBar";
 const LoginPage = () => {
     const [isMailWritten,setMailWritten] = useState(false)
     const [isLoading,setLoading] = useState(false)
+    
     const handleClick = (bool:boolean) => {
         setLoading(true);
         setTimeout(() => {

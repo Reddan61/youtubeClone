@@ -7,26 +7,25 @@ import {CSSTransition} from "react-transition-group"
 import ClockIcon from '../svg/ClockIcon'
 import Router from 'next/router'
 import { convertCount } from '../../assets/functions/convertCount'
+import { IVideoList } from '../../store/videoListReducer'
+import { convertAvatarSrc } from '../../assets/functions/convertAvatarSrc'
 
-interface IProps {
+interface IProps extends IVideoList{
     little?:boolean,
     list?:boolean,
     hideUsername?:boolean
 }
 
-const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername = false}) => {
-    const hoverRef = useRef<HTMLDivElement>(null);
+const VideoPreview:React.FC<IProps> = ({
+        little = false,list = false,hideUsername = false,
+        author,date,viewersCount,videoTitle,userId,previewsSrc,delay,id,videoPreview
+    }) => {
+    const hoverRef = useRef<HTMLDivElement>(null)
+
     const [currentImg,setCurrentImg] = useState(null)
-    const [titleSymbol,setTitleSymbol] = useState(undefined);
+    const [titleSymbol,setTitleSymbol] = useState(undefined)
     const [isImagesReady,setImagesReady] = useState(false)
-    const userId = "1"
-    const arrImgSrc = ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"]
-    const titleText = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has Lorem Ipsum has";
-    // const titleText = "фффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффффф";
-    const nickaname = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    const viewersCount = 111520
-    const date = new Date("2021-06-01")
-    const time = "11:33"
+
     //Кол-во символов для title
     const symbolNumberTitle = useCallback(() => {
         const windowSize = window.innerWidth
@@ -43,12 +42,12 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername
         }
     },[])
     const clickOnVideo = () => {
-        Router.push(`/video/${1}`)
+        Router.push(`/video/${id}`)
     }
     //preload images
-    useEffect(() => {
+    const preloadImages =() => {
         let promises = [];
-        arrImgSrc.forEach(picture => {
+        previewsSrc.forEach(picture => {
             promises.push(new Promise<void>((resolve,reject) => {
                 const img = new window.Image()
                 img.onload = () => {
@@ -60,7 +59,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername
         Promise.all(promises).then(() => {       
             setImagesReady(true)
         })
-    },[])
+    }
 
     //Изменение кол-ва символов в title
     useEffect(() => {
@@ -76,8 +75,8 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername
         let imgTimeout : ReturnType<typeof setTimeout> = null;
         let currentIndex = 0;
         const hoverHandler = () => {
-            setCurrentImg(arrImgSrc[currentIndex])
-                if(currentIndex + 1 > (arrImgSrc.length - 1)) {
+            setCurrentImg(previewsSrc[currentIndex])
+                if(currentIndex + 1 > (previewsSrc.length - 1)) {
                     currentIndex = 0;
                 } else {
                     currentIndex++;
@@ -87,6 +86,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername
             },5000)
         }
         hoverRef.current.onmouseenter = () => {
+            preloadImages()
             hoverTimeout = setTimeout(() => {
                 if(imgTimeout !== null) {
                     return
@@ -117,20 +117,20 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername
                         }}
                     > 
                     <>
-                        <Image src = {"/imgTest.jpg"} className = {classes.videoPreview__preview} layout = {"fill"}  />
+                        <Image src = {convertAvatarSrc(videoPreview)} className = {classes.videoPreview__preview} layout = {"fill"}  />
                     </>
                 </CSSTransition>
 
                 {/* Слайдер */}
-                {arrImgSrc.map((el,index) => {
+                {previewsSrc.map((el,index) => {
                     return <div key = {index} style = {{
-                        visibility: arrImgSrc[index] === currentImg ? "visible" : "hidden"
+                        visibility: previewsSrc[index] === currentImg ? "visible" : "hidden"
                     }} className = {classes.image}>
                         <img className = {classes.image__img} src = {el} width = {"100%"}  />
                     </div>
                 })}
                 
-                <div className = {classes.videoPreview__time}>{time}</div>
+                <div className = {classes.videoPreview__time}>{delay}</div>
                 <div className = {classes.videoPreview__later}>
                     <ClockIcon classModule = {classes.icon__clock}/>
                 </div>
@@ -146,7 +146,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername
                 
                 <div className = {classes.videoPreview__bottomInfo}>
                     <div className = {classes.videoPreview__title}>
-                        <span className = {`showTitle`}>{convertTitle(titleText,titleSymbol)}</span>
+                        <span className = {`showTitle`}>{convertTitle(videoTitle,titleSymbol)}</span>
                     </div>
 
                     {list && 
@@ -166,7 +166,7 @@ const VideoPreview:React.FC<IProps> = ({little = false,list = false,hideUsername
                                 <Image layout = {'fixed'} className = {classes.videoPreview__avatar} src = {"/imgTest.jpg"} width = {24} height = {24}/>
                             </div>
                         }
-                            <span className = {`showTitle`}>{nickaname}</span>
+                            <span className = {`showTitle`}>{author}</span>
                         </div>
                     }
                     {!list && 

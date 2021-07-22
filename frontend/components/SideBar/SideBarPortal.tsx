@@ -6,23 +6,26 @@ import YoutubeIcon from "../svg/YoutubeIcon";
 import classes from "./sideBarPortal.module.scss"
 import {CSSTransition } from "react-transition-group"
 import SideBarContent from "./SideBarContent";
+import sideBarReducer from "../../store/sideBarReducer"
+import { observer } from "mobx-react-lite";
 
 interface IProps {
-    isOpenSideBarPortal?:boolean,
-    setOpenSideBarPortal: (fun:(state:boolean) => boolean) => void
+
 }
 
-const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPortal}) => {
+const SideBarPortal:React.FC<IProps> = ({}) => {
     const [isBrowser,setIsBrowser] = useState(false) 
     const [startAnimation,setStartAnimation] = useState(true)    
+
     const ref = useRef<HTMLDivElement>(null)
+
     const burgerHandler = () => {
         setStartAnimation(false)
         setTimeout(() => {
-            setOpenSideBarPortal(state => !state)
+            sideBarReducer.changeOpenSideBarPortal()
         },300)
     }
-
+    
     useEffect(() => {
         ref.current = document.createElement("div");
         const parentElem = document.querySelector('#__next');
@@ -78,4 +81,4 @@ const SideBarPortal:React.FC<IProps> = ({setOpenSideBarPortal,isOpenSideBarPorta
     }
 }
 
-export default React.memo(SideBarPortal);
+export default React.memo(observer(SideBarPortal))

@@ -6,6 +6,7 @@ import "../styles/main.scss"
 import Prompt from '../components/Prompt/Prompt'
 
 export default function App({Component, pageProps}:AppProps) {
+
     return <div style = {{
         width:"100%",
         display:"flex",

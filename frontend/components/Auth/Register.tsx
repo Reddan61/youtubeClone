@@ -9,20 +9,20 @@ import classes from "./Register.module.scss"
 import Router from "next/router"
 import {CSSTransition} from 'react-transition-group'
 import ProgressBar from '../ProgressBar/ProgressBar';
+import globalHistoryReducer from '../../store/globalHistoryReducer';
 
 const Register = () => {
-    //Анимация будет срабатывать когда пользователь перейдет из verifyemail
-    const [userClicked,] = useState(true)
+
     const [startExitAnimation,setStartExitAnimation] = useState(true)
     const [isLoading,setLoading] = useState(false)
+
     const submit = () => {
         setLoading(true)
         setTimeout(() => {
-            setLoading(false)
             setStartExitAnimation(false)
-            setTimeout(() => {
-                Router.push('/verifyemail')
-            },300)
+            setLoading(false)
+    
+
         },1000)
         
     }
@@ -39,13 +39,17 @@ const Register = () => {
                 <CSSTransition
                     in = {startExitAnimation}
                     timeout = {300}
-                    appear  ={userClicked}
+                    appear  ={globalHistoryReducer.history[globalHistoryReducer.history.length - 2] === "verifyemail"}
                     classNames = {{
                         appear:classes.animation__appear,
                         appearActive:classes.animation__appear_active,
                         exit:classes.animation__exit,
                         exitActive:classes.animation__exit_active
                     }}
+                    onExited = {() => {
+                        Router.push('/verifyemail')
+                    }}
+                    unmountOnExit
                 >
                     <div className = {classes.form}>
                         <div className = {classes.form__content}>
