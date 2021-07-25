@@ -1,3 +1,4 @@
+import { Field, Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import CheckBox from "../Formik/CheckBox";
@@ -13,15 +14,31 @@ interface IProps {
 const Save:React.FC<IProps> = ({id,isSaved = false}) => {
     const [isOpen,setOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
-    
+    const formRef = useRef(null)
+
     useEffect(() => {
-        ref.current = document.createElement("div");
-        const parentElem = document.querySelector('#__next');
+        ref.current = document.createElement("div")
+        const parentElem = document.querySelector('#__next')
+
         parentElem.appendChild(ref.current)
         return () => {      
             parentElem.removeChild(ref.current)
         }
     },[])
+    useEffect(() => {
+        if(isOpen) {
+            document.documentElement.style.overflow = "hidden"
+        }
+        return () => {
+            document.documentElement.style.overflow = "auto"
+        }
+    },[isOpen])
+
+    const submit = (value) => {
+        console.log(value);
+        formRef.current.setSubmitting(false)
+    }
+
     return <div className = {classes.save}>
         <div onClick = {() => {
             setOpen(true)
@@ -42,11 +59,30 @@ const Save:React.FC<IProps> = ({id,isSaved = false}) => {
                     }} classModule = {classes.icon__cross}/>
                 </div>
                 <div className = {classes.popup__body}>
-                    <ul>
-                        <li>
-                            <CheckBox isChecked = {isSaved} label = {"Смотреть позже"}/>
-                        </li>
-                    </ul>
+                    <Formik
+                        initialValues = {{
+                            later:isSaved
+                        }}
+                        onSubmit = {submit}
+                        innerRef = {formRef}
+                    >
+                        {({isSubmitting,values}) => (
+                            <Form onChange = {() => {
+                                formRef.current.handleSubmit()
+                            }}>
+                                <ul>
+                                    <li>
+                                        <Field component = {CheckBox} 
+                                            disabled = {isSubmitting}
+                                            name = {'later'}
+                                            label = {"Смотреть позже"} 
+
+                                        />
+                                    </li>
+                                </ul>
+                            </Form>
+                        )}
+                    </Formik>
                 </div>
             </div>
         </div>,ref.current)}

@@ -65,8 +65,7 @@ const VideoPage:React.FC<IVideo> = (props) => {
     useEffect(() => {
         videoReducer.setInitialState(props)
         setIsBrowser(true)
-    },[])
-
+    },[])    
     return <div className = {classes.videoPage}>
         <div className = {classes.videoPage__container}>
             <div className = {classes.videoPage__left}>

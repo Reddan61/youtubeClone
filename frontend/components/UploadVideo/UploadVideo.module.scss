@@ -45,6 +45,23 @@
         display: flex;
         justify-content: space-between;
         flex: 1 1 auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+        &::-webkit-scrollbar {
+            width:14px;
+        }
+        &::-webkit-scrollbar-thumb {
+            border: 3px solid transparent;
+            border-radius: 9px;
+            background-clip: content-box;
+            background-color: rgb(96,96,96);
+        }
+
+        &::-webkit-scrollbar-track-piece {
+            background-color: rgb(249,249,249);
+            margin-bottom: 53px;
+        }
+
         &_first {
             @include mixins.flexBox()
         }
@@ -92,6 +109,7 @@
         align-items: center;
         z-index: 9999999;
         justify-content: space-between;
+        background-color: white;
         span {
             margin: 0 0 0 20px;
             font-size: 13px;

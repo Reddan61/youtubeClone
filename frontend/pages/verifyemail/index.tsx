@@ -11,26 +11,20 @@ const Index = () => {
     const [showPage,setShowPage] = useState(false)
 
     useEffect(() => {
-        if(authReducer.isAuth) {
-            router.push('/')
-        } else {
-            if(globalHistoryReducer.history[globalHistoryReducer.history.length - 1] !== "register") {
-                
-                Router.push('/register')
-            } else {
-                setShowPage(true)
-            }
+        if(globalHistoryReducer.history[globalHistoryReducer.history.length - 1] !== "register") {
+            
+            Router.push('/register')
         }
-
         globalHistoryReducer.addUrl("verifyemail")
+        setShowPage(true)
     },[])
     return <>
-    {
-        showPage &&
-        <VerifyEmail />
-    }
+        {
+            showPage &&
+            <VerifyEmail />
+        }
     </>
 }
 
 
-export default observer(Index)
+export default Index

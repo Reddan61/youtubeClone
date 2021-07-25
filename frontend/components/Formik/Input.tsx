@@ -1,24 +1,26 @@
-import React from "react"
+import { FieldProps } from "formik";
+import React, { useEffect, useState } from "react"
 import ErrorSignIcon from "../svg/ErrorSignIcon"
 import classes from "./Input.module.scss"
 
-interface IProps {
+interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
     width?:string,
     height?:string,
     placeholder:string,
-    classModule:string
+    classModule:string,
+    isError: boolean,
+    helpText:string
 }
 
-const Input:React.FC<IProps> = ({width,placeholder,height,classModule}) => {
-    let isError = false;
+const Input:React.FC<FieldProps<any> & IProps> = ({isError,helpText,width,placeholder,height,classModule,field,form,...props}) => {
     return <div className = {`${classes.input} ${isError && classes.input_error} ${classModule}`}>
         <div className = {classes.input__container}>
-            <input />
+            <input {...props} {...field} required/>
             <label>{placeholder}</label>
         </div>
         {isError && <div className = {classes.error}>
             <ErrorSignIcon classModule = {classes.error__sign}/>
-            <span>Введите адрес электронной почты или номер телефона</span>
+            <span>{helpText}</span>
         </div>}
     </div>
 }

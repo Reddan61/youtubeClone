@@ -30,8 +30,10 @@ const SideBarPortal:React.FC<IProps> = ({}) => {
         ref.current = document.createElement("div");
         const parentElem = document.querySelector('#__next');
         parentElem.appendChild(ref.current)
+        document.documentElement.style.overflow = "hidden"
         setIsBrowser(true)
         return () => {      
+            document.documentElement.style.overflow = "auto"
             parentElem.removeChild(ref.current)
         }
     },[])

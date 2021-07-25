@@ -10,21 +10,24 @@ import Router from "next/router"
 import {CSSTransition} from 'react-transition-group'
 import ProgressBar from '../ProgressBar/ProgressBar';
 import globalHistoryReducer from '../../store/globalHistoryReducer';
+import { Field, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+import authReducer from '../../store/authReducer';
+import WithAuth from '../HOC/withAuth';
+
 
 const Register = () => {
 
     const [startExitAnimation,setStartExitAnimation] = useState(true)
     const [isLoading,setLoading] = useState(false)
 
-    const submit = () => {
-        setLoading(true)
-        setTimeout(() => {
-            setStartExitAnimation(false)
-            setLoading(false)
-    
-
-        },1000)
+    const submit = async (values) => {
+        console.log(values);
         
+        setLoading(true)
+        await authReducer.registrationUser(values)
+        setStartExitAnimation(false)
+        setLoading(false)
     }
     return <div className = {classes.register}>
         {isLoading && <ProgressBar classModule = {classes.register__progress}/>}
@@ -52,20 +55,67 @@ const Register = () => {
                     unmountOnExit
                 >
                     <div className = {classes.form}>
-                        <div className = {classes.form__content}>
-                            <Input classModule = {`${classes.register__input} ${classes.input__name}`} placeholder = {"Имя"}/>
-                            <Input classModule = {`${classes.register__input} ${classes.input__secondName}`} placeholder = {"Фамилия"}/>
-                            <Input classModule = {`${classes.register__input} ${classes.input__email}`} placeholder = {"Адрес электронной почты"}/>
-                            <span className = {`${classes.register__text} ${classes.register__text_email}`}>Вам нужно будет подтвердить, что это ваш адрес электронной почты</span>
-                            <Input classModule = {`${classes.register__input} ${classes.input__password}`} placeholder = {"Пароль"}/>
-                            <Input classModule = {`${classes.register__input} ${classes.input__passwordSub}`} placeholder = {"Подтвердить"}/>
-                            <span className = {`${classes.register__text} ${classes.register__text_password}`}>Пароль должен содержать не менее восьми знаков, включать буквы, цифры и специальные символы</span>
-                            <CheckBox classModule = {classes.register__checkbox} label = {"Показать пароль"} />
-                        </div>
-                        <div className = {classes.form__buttons}>
-                            <LinkButton onClick = {() => Router.push('/login')} label = {"Войти"}/>
-                            <BlueButton label = {"Далее"} onClick = {() => submit()}/>
-                        </div>
+                            <Formik
+                                initialValues = {{
+                                    name:"",
+                                    secondName:"",
+                                    email:"",
+                                    password:"",
+                                    passwordSub:"",
+                                    showPassword:false
+                                }}
+                                onSubmit = {submit}
+                                validationSchema = {registrationSchema}
+                            >
+                                {({values,errors,touched,isSubmitting}) => (
+                                    <Form>
+                                        <div className = {classes.form__content}>
+                                            <Field 
+                                                classModule = {`${classes.register__input} ${classes.input__name}`} placeholder = {"Имя"}
+                                                component = {Input} name = {"name"}
+                                                isError = {Boolean(errors.name) && touched.name}
+                                                helpText = {errors.name}
+                                            />
+                                            <Field 
+                                                classModule = {`${classes.register__input} ${classes.input__secondName}`} placeholder = {"Фамилия"}
+                                                component = {Input} name = {"secondName"}
+                                                isError = {Boolean(errors.secondName) && touched.secondName}
+                                                helpText = {errors.secondName}
+                                            />
+                                            <Field 
+                                                classModule = {`${classes.register__input} ${classes.input__email}`} placeholder = {"Адрес электронной почты"}
+                                                component = {Input} name = {"email"}
+                                                isError = {Boolean(errors.email) && touched.email}
+                                                helpText = {errors.email}
+                                            />
+                                            <span className = {`${classes.register__text} ${classes.register__text_email}`}>Вам нужно будет подтвердить, что это ваш адрес электронной почты</span>
+                                            <Field 
+                                                classModule = {`${classes.register__input} ${classes.input__password}`} placeholder = {"Пароль"}
+                                                component = {Input} name = {"password"}
+                                                isError = {Boolean(errors.password) && touched.password}
+                                                helpText = {errors.password}
+                                                type = {values.showPassword ? "text" :"password"}
+                                            />
+                                            <Field 
+                                                classModule = {`${classes.register__input} ${classes.input__passwordSub}`} placeholder = {"Подтвердить"}
+                                                component = {Input} name = {"passwordSub"}
+                                                isError = {Boolean(errors.passwordSub) && touched.passwordSub}
+                                                helpText = {errors.passwordSub}
+                                                type = {values.showPassword ? "text" :"password"}
+                                            />
+                                            <span className = {`${classes.register__text} ${classes.register__text_password}`}>Пароль должен содержать не менее восьми знаков, включать буквы, цифры и специальные символы</span>
+                                            <Field 
+                                                classModule = {classes.register__checkbox} label = {"Показать пароль"}
+                                                component = {CheckBox} name = {"showPassword"}
+                                            />
+                                        </div>
+                                        <div className = {classes.form__buttons}>
+                                            <LinkButton onClick = {() => Router.push('/login')} label = {"Войти"}/>
+                                            <BlueButton disabled = {isSubmitting} label = {"Далее"} type = {"submit"}/>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
                     </div>
                 </CSSTransition>
             </div>
@@ -78,4 +128,25 @@ const Register = () => {
     </div>
 }
 
-export default Register;
+const registrationSchema = Yup.object().shape({
+    name: Yup.string()
+        .min(3,"Минимум 3 символа")
+        .max(50, "Слишком много символов")
+        .required("Обязательное поле"),
+    secondName: Yup.string()
+        .min(3,"Минимум 3 символа")
+        .max(50, "Слишком много символов")
+        .required("Обязательное поле"),
+    email: Yup.string()
+        .email("Неправильный формат")
+        .required("Обязательное поле"),
+    password: Yup.string()
+        .min(5,"Минимум 5 символов")
+        .max(50, "Слишком много символов")
+        .required("Обязательное поле"),
+    passwordSub: Yup.string()
+        .oneOf([Yup.ref('password'), null], "Пароли должны совпадать")
+        .required("Обязательное поле"),
+})
+
+export default WithAuth(Register);

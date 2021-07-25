@@ -8,7 +8,7 @@
     &_error {
         input {
             border: 1px solid #d93025 !important;
-            &:focus {
+            &:focus,&:valid {
                 + label {
                     color:#d93025 !important
                 }
@@ -22,7 +22,7 @@
         border-radius: 4px;
         color: #202124;
         font-size: 16px;
-        &:focus {
+        &:focus,&:valid {
             border-color: rgb(26,115,232);
             + label {
                 color:rgb(26,115,232);

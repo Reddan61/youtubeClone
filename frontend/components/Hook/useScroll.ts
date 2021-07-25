@@ -3,20 +3,22 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 
 
 export const useScroll = (callback:() => Promise<void | any>) => {
-    const [isLoading,setLoading] = useState(false);
+    const [isLoading,setLoading] = useState(false)
     const isFirstRef = useRef(true)
-    const requestRef = useRef(false);
-    let oldPercent = 0;
-    let oldScrollPosition = 0;
+    const requestRef = useRef(false)
+    let oldPercent = 0
+    let oldScrollPosition = 0
 
-    const addNewVideosOnScroll = useCallback((e:Event) => {
-
-        //При первой загрузке страницы скролл в топ        
+    const addNewVideosOnScroll = useCallback((e:any) => {
+        //При первой загрузке страницы скролл в топ       
         if(isFirstRef.current) {
-            document.documentElement.scrollTo(0,0)
-            isFirstRef.current = false
-            return
+            setTimeout(() => {
+                document.documentElement.scrollTo(0,0)
+                isFirstRef.current = false
+            },50)
+           return
         }
+
         //Процент прокрутки
         const percent = window.scrollY/(document.documentElement.scrollHeight - document.documentElement.clientHeight) * 100
         //Определяет направление прокрутки
@@ -40,7 +42,7 @@ export const useScroll = (callback:() => Promise<void | any>) => {
         }
         
     },[])
-    
+  
     useEffect(() => {
         window.addEventListener("scroll",addNewVideosOnScroll)
         return () => {            

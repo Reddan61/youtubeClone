@@ -9,13 +9,8 @@ const Index = () => {
     const [showPage,setShowPage] = useState(false)
 
     useEffect(() => {
-        if(authReducer.isAuth) {
-            router.push('/')
-        } else {
-            setShowPage(true)
-        }
-
         globalHistoryReducer.addUrl("register")
+        setShowPage(true)
     },[])
 
 
@@ -28,4 +23,4 @@ const Index = () => {
 }
 
 
-export default observer(Index);
+export default Index;

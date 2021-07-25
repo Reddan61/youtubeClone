@@ -4,9 +4,16 @@ import Head from 'next/head'
 import { BaseSyntheticEvent, SyntheticEvent, useEffect, useRef } from 'react'
 import "../styles/main.scss"
 import Prompt from '../components/Prompt/Prompt'
+import authReducer from '../store/authReducer'
+import { observer } from 'mobx-react-lite'
 
-export default function App({Component, pageProps}:AppProps) {
-
+export default observer(function App({Component, pageProps}:AppProps) {
+    useEffect(() => {
+        //Проверка на авторизацию
+        (async function() {
+           await authReducer.initialUser()
+        })()
+    },[])
     return <div style = {{
         width:"100%",
         display:"flex",
@@ -21,4 +28,4 @@ export default function App({Component, pageProps}:AppProps) {
         <Prompt />
         <Component {...pageProps} />
     </div>
-}
+})

@@ -46,7 +46,6 @@ const HeaderLayout:React.FC<IProps> = ({children,onlyPortal}) => {
     }
 
     useEffect(() => {
-        authReducer.initialUser()
         if(router.query.search_query) {
             setSearchText(router.query.search_query as string)
         }

@@ -122,9 +122,7 @@
            
         }
         &:hover {
-            @media (min-width:1000px) {
-                background-color: rgba($color: black, $alpha: 0.1);
-            }
+            background-color: rgba($color: black, $alpha: 0.1);
         }
         &_active {
             span {

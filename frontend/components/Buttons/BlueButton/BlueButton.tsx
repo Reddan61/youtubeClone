@@ -1,14 +1,13 @@
 import React from "react";
 import classes from "./BlueButton.module.scss"
 
-interface IProps {
-    onClick?: (...args:any) => any,
+interface IProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     label:string
 }
 
-const BlueButton:React.FC<IProps> = ({onClick,label,children}) => {
+const BlueButton:React.FC<IProps> = ({onClick,label,children,type = "button", ...props}) => {
     return <>
-        <button className = {classes.button} onClick = {onClick}>{label} {children}</button>
+        <button type = {type} {...props} className = {classes.button} onClick = {onClick}>{label} {children}</button>
     </>
 }
 

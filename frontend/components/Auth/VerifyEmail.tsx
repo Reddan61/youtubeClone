@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import BlueButton from "../Buttons/BlueButton/BlueButton";
 import LinkButton from "../Buttons/LinkButton/LinkButton";
 import Input from "../Formik/Input";
@@ -8,12 +8,15 @@ import classes from "./VerifyEmail.module.scss"
 import { CSSTransition } from "react-transition-group"
 import Router from "next/router"
 import ProgressBar from "../ProgressBar/ProgressBar";
+import * as Yup from 'yup';
+import { Field, Form, Formik } from "formik";
+import authReducer from "../../store/authReducer";
+import WithAuth from "../HOC/withAuth";
 
 const VerifyEmail = () => {
-    const email = "Random@mail.ru"
     const [startAnimation, setStartAnimation] = useState(true);
     const [isLoading, setLoading] = useState(false)
-    
+
     const linkButtonHandler = () => {
         setLoading(true)
         setTimeout(() => {
@@ -22,8 +25,11 @@ const VerifyEmail = () => {
         }, 1000)
     }
 
-    const submit = () => {
-        Router.push("/")
+    const submit = (values, { setSubmitting }) => {
+        console.log('submit')
+        authReducer.confirmMail(values.code)
+        setSubmitting(false)
+        //Router.push("/")
     }
     return <div className={classes.verify}>
         {isLoading && <ProgressBar classModule={classes.verify__progress} />}
@@ -33,7 +39,7 @@ const VerifyEmail = () => {
                 <div className={classes.verify__top}>
                     <GoogleIcon classModule={classes.icon__google} />
                     <span className={classes.verify__title}>Подтвердите адрес электронной почты</span>
-                    <span className={classes.verify__subTitle}>Введите код подтверждения, отправленный на адрес {email}. Если письма нет во входящих, проверьте папку "Спам".</span>
+                    <span className={classes.verify__subTitle}>Введите код подтверждения, отправленный на адрес {authReducer.user.email}. Если письма нет во входящих, проверьте папку "Спам".</span>
                 </div>
                 <CSSTransition in={startAnimation}
                     appear
@@ -52,11 +58,28 @@ const VerifyEmail = () => {
                     unmountOnExit
                 >
                     <div className={classes.form}>
-                        <Input classModule={classes.form__input} placeholder={"Введите код"} />
-                        <div className={classes.form__buttons}>
-                            <LinkButton onClick={linkButtonHandler} label={"Назад"} />
-                            <BlueButton onClick = {submit} label={"Подтвердить"} />
-                        </div>
+                        <Formik
+                            initialValues = {{
+                                code:""
+                            }}
+                            onSubmit = {submit}
+                            validationSchema = {verifySchema}
+                        >
+                            {({values,isSubmitting,errors,touched}) => (
+                                <Form>
+                                    <Field component = {Input}
+                                        classModule={classes.form__input} placeholder={"Введите код"}
+                                        name = {"code"}
+                                        isError = {Boolean(errors.code) && touched.code}
+                                        helpText = {errors.code}
+                                    />
+                                    <div className={classes.form__buttons}>
+                                        <LinkButton onClick={linkButtonHandler} label={"Назад"} />
+                                        <BlueButton disabled = {isSubmitting} type = {"submit"} label={"Подтвердить"} />
+                                    </div>
+                                </Form>
+                            )}
+                        </Formik>
                     </div>
                 </CSSTransition>
             </div>
@@ -69,5 +92,9 @@ const VerifyEmail = () => {
     </div>
 }
 
+const verifySchema = Yup.object().shape({
+    code: Yup.string().required("Введите код с почты")
+})
 
-export default VerifyEmail;
+
+export default WithAuth(VerifyEmail);

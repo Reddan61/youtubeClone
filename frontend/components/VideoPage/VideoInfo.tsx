@@ -5,14 +5,14 @@ import { convertCount } from "../../assets/functions/convertCount";
 import Router from "next/router";
 import { IVideoSubInfo } from "../../store/videoReducer";
 import { convertAvatarSrc } from "../../assets/functions/convertAvatarSrc";
+import authReducer from "../../store/authReducer";
+import { observer } from "mobx-react-lite";
 
 interface IProps {
     info: IVideoSubInfo
 }
 
 const VideoInfo:React.FC<IProps> = ({info}) => {
-    const [isAuth,setAuth] = useState(true)
-
     const [isOpenText,setOpenText] = useState(false)
 
     const {avatarSrc,nickname,isSub,subscribersCount,text,userId} = info
@@ -38,7 +38,7 @@ const VideoInfo:React.FC<IProps> = ({info}) => {
                     </div>
                 </div>
                 <div className = {`${classes.videoInfo__button} ${isSub && classes.videoInfo__button_active}`}>
-                    {isAuth && 
+                    {authReducer.isAuth && 
                         <button onClick = {subHandler}>{isSub?"Вы подписаны":"Подписаться"}</button>
                     }
                 </div>
@@ -54,4 +54,4 @@ const VideoInfo:React.FC<IProps> = ({info}) => {
 }
 
 
-export default VideoInfo
+export default observer(VideoInfo)
