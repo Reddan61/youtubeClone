@@ -11,7 +11,7 @@ export default observer(function App({Component, pageProps}:AppProps) {
     useEffect(() => {
         //Проверка на авторизацию
         (async function() {
-           await authReducer.initialUser()
+          // await authReducer.initialUser()
         })()
     },[])
     return <div style = {{

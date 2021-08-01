@@ -9,13 +9,13 @@ export function WithAuth<WP>(Component:ComponentType<WP>) {
         const [isLoading,setLoading] = useState(true);
         const router = useRouter()
 
-        useEffect(() => {
-            (async function() {
-                setLoading(true)
-                await authReducer.initialUser()
-                setLoading(false)
-            })()
-        },[])
+        // useEffect(() => {
+        //     (async function() {
+        //         setLoading(true)
+        //         await authReducer.initialUser()
+        //         setLoading(false)
+        //     })()
+        // },[])
 
         if(authReducer.isAuth) {   
             router.push('/')
