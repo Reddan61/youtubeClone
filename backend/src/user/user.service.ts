@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import * as bcrypt from 'bcrypt';
 import { Model } from "mongoose";
 import { User, UserDocument } from "./schemas/user.schema";
 
@@ -16,6 +15,21 @@ export class UserService {
     async createUser(user) {
         const createdUser = new this.userModel(user)
         const result = await createdUser.save()
+
+        return result
+    }
+
+    async addUpload(userId:string,videoId:string) {
+        const result = await this.userModel.findOneAndUpdate(
+            {_id:userId},
+            {
+                "$push":{
+                    uploadIds:videoId
+                }
+            },{
+                new:true
+            }
+        )
 
         return result
     }

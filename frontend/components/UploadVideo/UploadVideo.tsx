@@ -169,6 +169,7 @@ const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
 
 const uploadSchema = Yup.object().shape({
     name: Yup.string()
+        .min(5,"Слишком мало символов")
         .max(100, "Слишком много символов")
         .required("Обязательное поле"),
     description: Yup.string()

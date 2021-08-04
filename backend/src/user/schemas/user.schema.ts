@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
+import * as mongoose from 'mongoose';
+import { Video } from './../../videos/schemas/video.schema';
+
 
 export type UserDocument = User & Document
 
@@ -31,6 +34,9 @@ export class User {
         required:true
     })
     passwordHash:string
+
+    @Prop({type:[{type: mongoose.Schema.Types.ObjectId, ref: 'Video'}]})
+    uploadIds: Video[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

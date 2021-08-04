@@ -13,6 +13,11 @@ export class AuthService {
 
     async validateUser(email:string,password:string) {
         const user = await this.userService.findByEmail(email)
+
+        if(!user[0]) {
+            throw new HttpException("Пользователя не существует",HttpStatus.FORBIDDEN)
+        }
+
         const isCurrect = await bcrypt.compare(password, user[0].passwordHash)
         if(user && isCurrect) {
             const {passwordHash, ...result} = user[0].toObject()
@@ -55,10 +60,13 @@ export class AuthService {
         const result = await this.userService.createUser(newUser)
 
         return {
-            id: result.id,
-            name: result.name,
-            secondName:result.secondName,
-            email:result.email
+            message:"success",
+            payload: {
+                id: result.id,
+                name: result.name,
+                secondName:result.secondName,
+                email:result.email
+            }
         }
     }
 }
