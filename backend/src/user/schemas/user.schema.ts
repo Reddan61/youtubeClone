@@ -37,6 +37,29 @@ export class User {
 
     @Prop({type:[{type: mongoose.Schema.Types.ObjectId, ref: 'Video'}]})
     uploadIds: Video[]
+
+    @Prop({
+        default:""
+    })
+    avatar:string
+
+    @Prop({
+        type: [
+            {
+                videoId: {
+                    type: mongoose.Schema.Types.ObjectId, ref: 'Video'
+                },
+                rating: {
+                    type:Number
+                }
+            }
+        ]
+    })
+    rating: {
+        videoId:string,
+        rating:  0 | 1 | 2
+    }[]
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

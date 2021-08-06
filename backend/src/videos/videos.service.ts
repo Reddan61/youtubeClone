@@ -1,13 +1,18 @@
 import { RegisterVideoDto } from './dto/register-video.dto';
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { BadRequestException, HttpCode, HttpStatus, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import * as ffmpeg from "fluent-ffmpeg"
 import * as moment from 'moment';
+import { join } from "path"
 import { getVideoDurationInSeconds } from "get-video-duration"
+import { createReadStream, statSync } from "fs"
+import * as mongoose from 'mongoose'
 import { IValidateJWT } from "src/auth/jwt.strategy";
 import { UserService } from 'src/user/user.service';
 import { Video, VideoDocument } from "./schemas/video.schema";
+import { IncomingHttpHeaders } from 'http';
+import { RatingVideoDto } from './dto/rating-video.dto';
 
 
 @Injectable()
@@ -17,6 +22,7 @@ export class VideosService {
         private readonly userService:UserService
     ) {}
     
+    //загрузка видео
     async uploadVideo(file:Express.Multer.File,user:IValidateJWT) {
         if(!file) {
             throw new BadRequestException()
@@ -47,11 +53,9 @@ export class VideosService {
         }  
     }
 
+    //публикация видео
     async public(file:Express.Multer.File, info: RegisterVideoDto) {
-
-        const videoResult = await this.videoModel.findById(info.videoId).exec()
-        
-        if(!videoResult || !file) {
+        if(!file) {
             throw new BadRequestException()
         }
 
@@ -93,9 +97,14 @@ export class VideosService {
        }
     }
 
+    //Получение рандомных скриншотов из видео
     async screenshots(videoId:string):Promise<string[]> {
         const video = await this.videoModel.findById(videoId)
 
+        if(!video) {
+            throw new BadRequestException()
+        }
+        
         const duration = await this.getVideoDuration(video.url)
         let filenames = []
         let timestamps:number[] = []
@@ -139,5 +148,112 @@ export class VideosService {
             return this.getRandomTimemarks(arr,max)
         }
         return count
+    }
+
+
+    async stream(videoId:string,headers:IncomingHttpHeaders,res:any ) {
+        const range = headers.range
+
+        if(!range) {
+            throw new BadRequestException("Requires Range Header")
+        }
+
+        if(!videoId || !mongoose.Types.ObjectId.isValid(videoId)) {
+            throw new BadRequestException()
+        }
+
+        const video = await this.videoModel.findById(videoId).exec()
+
+        if(!video || !video.isPublicated) {
+            throw new BadRequestException()
+        }
+
+        const videoPath = join(process.cwd(),video.url)
+
+        const videoSize = statSync(videoPath).size
+
+        const CHUNK_SIZE = 10 ** 6
+        const start = Number(range.replace(/\D/g, ""))
+        const end = Math.min(start + CHUNK_SIZE, videoSize - 1)
+
+        const contentLength = end - start + 1
+        const headerObj = {
+            "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+            "Accept-Ranges": "bytes",
+            "Content-Length": contentLength,
+            "Content-Type": "video/mp4"
+        }
+
+        res.writeHead(HttpStatus.PARTIAL_CONTENT,headerObj)
+
+        const videoStream = createReadStream(videoPath, { start, end })
+        
+        videoStream.pipe(res)
+    }
+
+    async rating(user:IValidateJWT,body:RatingVideoDto) {
+        if(!mongoose.Types.ObjectId.isValid(body.videoId)) {
+            throw new BadRequestException()
+        }
+
+        const userRating = await this.userService.rating(user,body.videoId, body.rating)
+
+        if(userRating.status !== "success") {
+            throw new InternalServerErrorException()
+        }
+
+        const foundedVideo = await this.videoModel.findById(body.videoId)
+
+        if(!foundedVideo) {
+            throw new BadRequestException()
+        }
+
+        let newRatingObj = {...foundedVideo.rating}
+        console.log(newRatingObj)
+        console.log(userRating.payload)
+
+        if(userRating.payload.oldRating === 0) {
+            if(userRating.payload.userRating === 1) {
+                newRatingObj.likes++
+            } else if(userRating.payload.userRating === 2) {
+                newRatingObj.dislikes++
+            }
+        }
+
+        if(userRating.payload.oldRating === 2 && userRating.payload.userRating === 1 ) {
+            newRatingObj.dislikes--
+            newRatingObj.likes++
+        }
+
+        if(userRating.payload.oldRating === 1 && userRating.payload.userRating === 2 ) {
+            newRatingObj.dislikes++
+            newRatingObj.likes--
+        }
+
+        if(userRating.payload.oldRating === 1 && userRating.payload.userRating === 0 ) {
+            newRatingObj.likes--
+        }
+
+        if(userRating.payload.oldRating === 2 && userRating.payload.userRating === 0 ) {
+            newRatingObj.dislikes--
+        }
+
+        const result =  await this.videoModel.findByIdAndUpdate(body.videoId, {
+            "$set" : {
+                rating : {
+                    ...newRatingObj
+                }
+            }
+        },{
+            new:true
+        })
+
+        return {
+            message:"success",
+            payload: {
+                ...result.rating,
+                rating: userRating.payload.userRating
+            }
+        }
     }
 }

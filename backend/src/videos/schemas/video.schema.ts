@@ -28,7 +28,17 @@ export class Video {
     })
     isPublicated:boolean
     
-
+    @Prop({
+        type:Object,
+        default: {
+            likes:0,
+            dislikes:0
+        }
+    })
+    rating: {
+        likes:number,
+        dislikes:number
+    }
 }
 
 export const VideoSchema = SchemaFactory.createForClass(Video)

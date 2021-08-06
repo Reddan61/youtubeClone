@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Put, UploadedFile, UseGuards, UseInterceptors, Req, Patch } from "@nestjs/common";
+import { Body, Controller, Post, Headers, UploadedFile, UseGuards, UseInterceptors, Req, Patch, Get, Param, Res } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { multerSettings } from "src/core/multer";
+import { RatingVideoDto } from "./dto/rating-video.dto";
 import { RegisterVideoDto } from "./dto/register-video.dto";
 import { VideosService } from "./videos.service";
 
@@ -26,4 +27,14 @@ export class VideosController {
         return this.videosService.public(file,body)
     }
 
+    @Get("/stream/:id")
+    async video(@Param("id") param, @Headers() headers, @Res() res) {
+        return this.videosService.stream(param,headers,res)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch("/rating")
+    async rating(@Req() req, @Body() body:RatingVideoDto) {
+        return this.videosService.rating(req.user,body)
+    }
 }

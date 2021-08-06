@@ -33,9 +33,10 @@ export class AuthService {
         const access_token = this.jwtService.sign(payload)
         
         res.cookie('token', access_token, {httpOnly:true})
-
+       
         return {
-          message: "success"
+          message: "success",
+          payload: user
         }
     }
 
