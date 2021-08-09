@@ -22,12 +22,13 @@ const Register = () => {
     const [isLoading,setLoading] = useState(false)
 
     const submit = async (values) => {
-        console.log(values);
-        
         setLoading(true)
         await authReducer.registrationUser(values)
         setStartExitAnimation(false)
         setLoading(false)
+        setTimeout(() => {
+            Router.push(`/verifyemail?email=${values.email}&hash=123`)
+        },300)
     }
     return <div className = {classes.register}>
         {isLoading && <ProgressBar classModule = {classes.register__progress}/>}
@@ -49,9 +50,9 @@ const Register = () => {
                         exit:classes.animation__exit,
                         exitActive:classes.animation__exit_active
                     }}
-                    onExited = {() => {
-                        Router.push('/verifyemail')
-                    }}
+                    // onExited = {() => {
+                    //     Router.push('/verifyemail')
+                    // }}
                     unmountOnExit
                 >
                     <div className = {classes.form}>

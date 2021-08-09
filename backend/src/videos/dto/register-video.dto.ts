@@ -1,4 +1,4 @@
-import { Equals, IsEmail, IsMongoId, IsNotEmpty, Max, MaxLength, Min, MinLength } from "class-validator"
+import { IsMongoId, IsNotEmpty, MaxLength, MinLength } from "class-validator"
 import { Match } from "src/decorators/match.decorator"
 
 export class RegisterVideoDto {

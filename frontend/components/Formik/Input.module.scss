@@ -22,7 +22,7 @@
         border-radius: 4px;
         color: #202124;
         font-size: 16px;
-        &:focus,&:valid {
+        &:focus,&:not([value=""]) {
             border-color: rgb(26,115,232);
             + label {
                 color:rgb(26,115,232);

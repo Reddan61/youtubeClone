@@ -1,8 +1,9 @@
 import { RegisterAuthDto } from './dto/register-auth.dto';
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from "@nestjs/common";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from "src/user/user.service";
+import { sendEmail } from 'src/utils/email';
 
 @Injectable()
 export class AuthService {
@@ -20,8 +21,14 @@ export class AuthService {
 
         const isCurrect = await bcrypt.compare(password, user[0].passwordHash)
         if(user && isCurrect) {
-            const {passwordHash, ...result} = user[0].toObject()
-            return result
+            //const {passwordHash, ...result} = user[0].toObject()
+            return {
+                _id: user[0]._id,
+                name:user[0].name,
+                secondName: user[0].secondName,
+                email: user[0].email,
+                avatar: user[0].avatar
+            }
         }
         return null
     }
@@ -45,12 +52,15 @@ export class AuthService {
 
         if(user && user[0]?.isActivated) {
             throw new HttpException("Пользователь с такой почтой существует",HttpStatus.CONFLICT)
+        } else if(user && user[0]?.isActivated === false) {
+            await this.userService.deleteById(user[0]._id)
         }
-
         const newUser = {
             ...body,
-            passwordHash:null
+            passwordHash:null,
+            verifyHash:null
         }
+
         delete newUser.password
         delete newUser.passwordSub
 
@@ -58,7 +68,38 @@ export class AuthService {
 
         newUser.passwordHash = await bcrypt.hash(body.password, salt)
 
+        async function generateVerifyHash() {
+            const code = Math.trunc(Math.random() * (9999 - 1000) + 1000)
+            const codeHashed = await bcrypt.hash(String(code), salt) 
+
+            const userCodeFound = await this.userService.getUserByHashCode(codeHashed)
+       
+
+            if(userCodeFound[0]) {
+                generateVerifyHash()
+            }
+
+            return [code, codeHashed]
+        }
+        
+
+        const [code,verifyHash] = await generateVerifyHash.call(this)
+        newUser.verifyHash = verifyHash
+
         const result = await this.userService.createUser(newUser)
+        
+        const auth = await sendEmail({
+            from: 'admin@mail.ru',
+            to:result.email,
+            subject:"Подтверждение почты",
+            hash: result.verifyHash,
+            code
+        })
+
+        if(auth.rejected[0]) {
+            await this.userService.deleteById(result._id)
+            throw new InternalServerErrorException()
+        }
 
         return {
             message:"success",
@@ -70,4 +111,45 @@ export class AuthService {
             }
         }
     }
+
+    async logout(res) {
+        res.cookie('token', "", {
+            httpOnly:true,
+            maxAge: 0
+        })
+        return {
+            message:"success"
+        }
+    }
+
+    async verify(body) {
+        if(!body.code || !body.hash) {
+            throw new BadRequestException()
+        }
+        const user = await this.userService.getUserByHashCode(body.hash)
+
+        if(!user[0]) {
+            throw new BadRequestException()
+        }
+
+        const isCurrect = await bcrypt.compare(String(body.code), user[0].verifyHash)
+        
+        if(!isCurrect) {
+            throw new HttpException({
+                status:HttpStatus.BAD_REQUEST,
+                error:"Неправильный код"
+            },HttpStatus.BAD_REQUEST)
+        }
+
+        const result = await this.userService.activate(user[0]._id)
+
+        if(result.message !== "success") {
+            throw new InternalServerErrorException()
+        }
+
+        return {
+            message:"success"
+        }
+    }
+
 }

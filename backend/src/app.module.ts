@@ -6,6 +6,7 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CommentModule } from './comment/comment.module';
 import { VideosModule } from './videos/videos.module,';
 
 @Module({

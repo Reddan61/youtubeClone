@@ -6,16 +6,19 @@ import GoogleIcon from "../svg/GoogleIcon";
 import VerifyAccountIcon from "../svg/VerifyAccountIcon";
 import classes from "./VerifyEmail.module.scss"
 import { CSSTransition } from "react-transition-group"
-import Router from "next/router"
+import Router, { useRouter } from "next/router"
 import ProgressBar from "../ProgressBar/ProgressBar";
 import * as Yup from 'yup';
 import { Field, Form, Formik } from "formik";
 import authReducer from "../../store/authReducer";
 import WithAuth from "../HOC/withAuth";
+import globalHistoryReducer from "../../store/globalHistoryReducer";
+
 
 const VerifyEmail = () => {
     const [startAnimation, setStartAnimation] = useState(true);
     const [isLoading, setLoading] = useState(false)
+    const router = useRouter()
 
     const linkButtonHandler = () => {
         setLoading(true)
@@ -26,7 +29,7 @@ const VerifyEmail = () => {
     }
 
     const submit = (values, { setSubmitting }) => {
-        console.log('submit')
+        
         authReducer.confirmMail(values.code)
         setSubmitting(false)
         //Router.push("/")
@@ -39,10 +42,10 @@ const VerifyEmail = () => {
                 <div className={classes.verify__top}>
                     <GoogleIcon classModule={classes.icon__google} />
                     <span className={classes.verify__title}>Подтвердите адрес электронной почты</span>
-                    <span className={classes.verify__subTitle}>Введите код подтверждения, отправленный на адрес {authReducer.user.email}. Если письма нет во входящих, проверьте папку "Спам".</span>
+                    <span className={classes.verify__subTitle}>Введите код подтверждения, отправленный на адрес {router.query.email}. Если письма нет во входящих, проверьте папку "Спам".</span>
                 </div>
                 <CSSTransition in={startAnimation}
-                    appear
+                    appear  ={globalHistoryReducer.history[globalHistoryReducer.history.length - 2] === "register"}
                     timeout={300}
                     classNames={{
                         appear: classes.animation__appear,

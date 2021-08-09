@@ -1,6 +1,8 @@
-import { Body, Controller, Post, Headers, UploadedFile, UseGuards, UseInterceptors, Req, Patch, Get, Param, Res } from "@nestjs/common";
+import { Body, Controller, Post, Headers, UploadedFile, UseGuards, UseInterceptors, Req, Patch, Get, Param, Res, Query } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
+import { AddCommentDto } from "src/comment/dto/add-comment.dto";
+import { RatingCommentDto } from "src/comment/dto/rating-comment.dto";
 import { multerSettings } from "src/core/multer";
 import { RatingVideoDto } from "./dto/rating-video.dto";
 import { RegisterVideoDto } from "./dto/register-video.dto";
@@ -11,7 +13,15 @@ import { VideosService } from "./videos.service";
 
 @Controller("videos")
 export class VideosController {
-    constructor(private readonly videosService:VideosService){}
+    constructor(
+        private readonly videosService:VideosService
+    ){}
+    
+    //Сделать get по id с получением user rating for video и для комментов
+    @Get("/")
+    async getMainVideos(@Query() query) {
+        return this.videosService.getMainVideos(query)
+    }
 
     @UseGuards(JwtAuthGuard)
     @Post("/upload")
@@ -35,6 +45,26 @@ export class VideosController {
     @UseGuards(JwtAuthGuard)
     @Patch("/rating")
     async rating(@Req() req, @Body() body:RatingVideoDto) {
-        return this.videosService.rating(req.user,body)
+        return this.videosService.ratingVideo(req.user,body)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post("/comment")
+    async addComment(@Body() body:AddCommentDto, @Req() req) {
+        return this.videosService.addComment(body,req.user)
+    }
+    
+    //изменение рейтинг для коммента
+    @UseGuards(JwtAuthGuard)
+    @Patch("/comment")
+    async ratingComment(@Body() body:RatingCommentDto,@Req() req) {
+        return this.videosService.ratingComment(req.user,body)
+    }
+
+    @Get("/comment")
+    async getComment(@Query() query) {
+        const {videoId, page} = query
+        
+        return this.videosService.getComments(videoId,page)
     }
 }

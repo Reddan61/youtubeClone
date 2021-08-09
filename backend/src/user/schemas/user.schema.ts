@@ -35,6 +35,11 @@ export class User {
     })
     passwordHash:string
 
+    @Prop({
+        required:true
+    })
+    verifyHash:string | null
+
     @Prop({type:[{type: mongoose.Schema.Types.ObjectId, ref: 'Video'}]})
     uploadIds: Video[]
 
@@ -55,8 +60,25 @@ export class User {
             }
         ]
     })
-    rating: {
+    ratingVideo: {
         videoId:string,
+        rating:  0 | 1 | 2
+    }[]
+
+    @Prop({
+        type: [
+            {
+                commentId: {
+                    type: mongoose.Schema.Types.ObjectId, ref: 'Comment'
+                },
+                rating: {
+                    type:Number
+                }
+            }
+        ]
+    })
+    ratingComment: {
+        commentId:string,
         rating:  0 | 1 | 2
     }[]
 

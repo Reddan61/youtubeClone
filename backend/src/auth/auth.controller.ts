@@ -1,5 +1,6 @@
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RegisterAuthDto } from './dto/register-auth.dto';
-import { Body, HttpCode, HttpStatus, Controller, Post, UseGuards, Req, Res, Response } from "@nestjs/common";
+import { Body, HttpCode, HttpStatus, Controller, Post, UseGuards, Req, Res, Response, Delete, Patch } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 
@@ -21,5 +22,16 @@ export class AuthController {
     login(@Req() request, @Res({ passthrough: true }) response: Response) {
 
         return this.authService.login(request,response)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete("/logout")
+    logout(@Res({ passthrough: true }) response: Response) {
+        return this.authService.logout(response)
+    }
+
+    @Patch("/verify")
+    verify(@Body() body) {
+        return this.authService.verify(body)
     }
 }

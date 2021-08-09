@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react"
 import VerifyEmail from "../../components/Auth/VerifyEmail"
-import Router from "next/router"
+import Router, { useRouter } from "next/router"
 import router from "next/router"
 import authReducer from '../../store/authReducer';
 import { observer } from "mobx-react-lite";
 import globalHistoryReducer from "../../store/globalHistoryReducer";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 
-const Index = () => {
-  
+const Index:React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {
     const [showPage,setShowPage] = useState(false)
 
     useEffect(() => {
-        if(globalHistoryReducer.history[globalHistoryReducer.history.length - 1] !== "register") {
-            
-            Router.push('/register')
+        const {email,hash} = props
+      
+        if(!email || !hash) {
+            router.push("/register")
         }
+
         globalHistoryReducer.addUrl("verifyemail")
         setShowPage(true)
     },[])
@@ -24,6 +26,17 @@ const Index = () => {
             <VerifyEmail />
         }
     </>
+}
+
+
+export const getServerSideProps:GetServerSideProps = async (context) => {
+    const query = context.query
+
+    return {
+        props:{ 
+            ...query
+        }
+    }
 }
 
 

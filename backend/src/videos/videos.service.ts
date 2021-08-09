@@ -13,15 +13,32 @@ import { UserService } from 'src/user/user.service';
 import { Video, VideoDocument } from "./schemas/video.schema";
 import { IncomingHttpHeaders } from 'http';
 import { RatingVideoDto } from './dto/rating-video.dto';
+import { CommentService } from 'src/comment/comment.service';
+import { AddCommentDto } from 'src/comment/dto/add-comment.dto';
+import { RatingCommentDto } from 'src/comment/dto/rating-comment.dto';
 
 
 @Injectable()
 export class VideosService {
     constructor(
         @InjectModel(Video.name) private videoModel: Model<VideoDocument>,
-        private readonly userService:UserService
+        private readonly userService:UserService,
+        private readonly commentService:CommentService,
     ) {}
     
+    async getVideoById(videoId:string) {
+        const result = await this.videoModel.findById(videoId)
+
+        if(!result) {
+            throw new BadRequestException()
+        }
+
+        return {
+            message:"success",
+            payload: result
+        }
+    }
+
     //загрузка видео
     async uploadVideo(file:Express.Multer.File,user:IValidateJWT) {
         if(!file) {
@@ -191,26 +208,25 @@ export class VideosService {
         videoStream.pipe(res)
     }
 
-    async rating(user:IValidateJWT,body:RatingVideoDto) {
+    async ratingVideo(user:IValidateJWT,body:RatingVideoDto) {
         if(!mongoose.Types.ObjectId.isValid(body.videoId)) {
             throw new BadRequestException()
         }
 
-        const userRating = await this.userService.rating(user,body.videoId, body.rating)
+        const userRating = await this.userService.ratingVideo(user,body.videoId, body.rating)
 
         if(userRating.status !== "success") {
             throw new InternalServerErrorException()
         }
 
-        const foundedVideo = await this.videoModel.findById(body.videoId)
+        const foundVideo = await this.videoModel.findById(body.videoId)
 
-        if(!foundedVideo) {
+        if(!foundVideo) {
             throw new BadRequestException()
         }
 
-        let newRatingObj = {...foundedVideo.rating}
-        console.log(newRatingObj)
-        console.log(userRating.payload)
+        let newRatingObj = {...foundVideo.rating}
+       
 
         if(userRating.payload.oldRating === 0) {
             if(userRating.payload.userRating === 1) {
@@ -254,6 +270,69 @@ export class VideosService {
                 ...result.rating,
                 rating: userRating.payload.userRating
             }
+        }
+    }
+
+    async ratingComment(user:IValidateJWT,body:RatingCommentDto) {
+        if(!mongoose.Types.ObjectId.isValid(body.commentId)) {
+            throw new BadRequestException()
+        }
+
+        const commentRating = await this.userService.ratingComment(user,body.commentId, body.rating)
+
+        if(commentRating.status !== "success") {
+            throw new InternalServerErrorException()
+        }
+
+        return this.commentService.rating(body.commentId,commentRating)
+    }
+
+
+    async addComment(body:AddCommentDto,user:IValidateJWT) {
+        const video = await this.videoModel.findById(body.videoId)
+
+        if(!video) {
+            throw new BadRequestException()
+        }
+
+        return this.commentService.addComment(body,user)
+    }
+
+
+    async getComments(videoId:string,page:number) {
+        if(!mongoose.Types.ObjectId.isValid(videoId)) {
+            throw new BadRequestException()
+        }
+
+        const video = await this.videoModel.findById(videoId)
+        
+        if(!video) {
+            throw new BadRequestException()
+        }
+
+        return this.commentService.getComments(videoId,page)
+    }
+
+
+
+    async getMainVideos(query) {
+        const {page = 1,name = ""} = query
+        const pageSize = 50
+
+        const totalVideos = await this.videoModel.countDocuments({name: {$regex: name,$options: "i"}}).exec()
+
+        const totalPages = Math.ceil(totalVideos/pageSize)
+
+        let skip = (page - 1) * pageSize < 0 ? totalPages * pageSize : (page - 1) * pageSize
+            
+
+        const limit = pageSize
+
+        const videos = await this.videoModel.find({name: {$regex: name,$options: "i"}}).select(["-isPublicated","-rating"]).limit(limit).skip(skip).exec()
+
+        return {
+            message:"success",
+            payload: videos
         }
     }
 }

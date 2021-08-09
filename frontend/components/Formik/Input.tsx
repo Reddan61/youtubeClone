@@ -15,7 +15,7 @@ interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const Input:React.FC<FieldProps<any> & IProps> = ({isError,helpText,width,placeholder,height,classModule,field,form,...props}) => {
     return <div className = {`${classes.input} ${isError && classes.input_error} ${classModule}`}>
         <div className = {classes.input__container}>
-            <input {...props} {...field} required/>
+            <input {...props} {...field}/>
             <label>{placeholder}</label>
         </div>
         {isError && <div className = {classes.error}>
