@@ -16,11 +16,15 @@ export class VideosController {
     constructor(
         private readonly videosService:VideosService
     ){}
-    
-    //Сделать get по id с получением user rating for video и для комментов
+   
     @Get("/")
     async getMainVideos(@Query() query) {
         return this.videosService.getMainVideos(query)
+    }
+
+    @Get("/video")
+    async getVideo(@Query() query, @Req() req) {
+        return this.videosService.getVideoById(query.videoId,req)
     }
 
     @UseGuards(JwtAuthGuard)
@@ -54,7 +58,7 @@ export class VideosController {
         return this.videosService.addComment(body,req.user)
     }
     
-    //изменение рейтинг для коммента
+   
     @UseGuards(JwtAuthGuard)
     @Patch("/comment")
     async ratingComment(@Body() body:RatingCommentDto,@Req() req) {
@@ -62,9 +66,15 @@ export class VideosController {
     }
 
     @Get("/comment")
-    async getComment(@Query() query) {
+    async getComment(@Query() query, @Req() req) {
         const {videoId, page} = query
         
-        return this.videosService.getComments(videoId,page)
+        return this.videosService.getComments(videoId,page,req)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get("/subscribe")
+    async getSubscribeVideos(@Req() req, @Query() query) {
+        return this.videosService.getSubscribeVideos(req.user,query)
     }
 }

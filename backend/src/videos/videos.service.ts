@@ -1,3 +1,4 @@
+import { IValidateJWT } from './../auth/jwt.strategy';
 import { RegisterVideoDto } from './dto/register-video.dto';
 import { BadRequestException, HttpCode, HttpStatus, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
@@ -6,9 +7,9 @@ import * as ffmpeg from "fluent-ffmpeg"
 import * as moment from 'moment';
 import { join } from "path"
 import { getVideoDurationInSeconds } from "get-video-duration"
+import jwtDecode from 'jwt-decode'
 import { createReadStream, statSync } from "fs"
 import * as mongoose from 'mongoose'
-import { IValidateJWT } from "src/auth/jwt.strategy";
 import { UserService } from 'src/user/user.service';
 import { Video, VideoDocument } from "./schemas/video.schema";
 import { IncomingHttpHeaders } from 'http';
@@ -16,6 +17,7 @@ import { RatingVideoDto } from './dto/rating-video.dto';
 import { CommentService } from 'src/comment/comment.service';
 import { AddCommentDto } from 'src/comment/dto/add-comment.dto';
 import { RatingCommentDto } from 'src/comment/dto/rating-comment.dto';
+import { Request } from 'express';
 
 
 @Injectable()
@@ -26,16 +28,42 @@ export class VideosService {
         private readonly commentService:CommentService,
     ) {}
     
-    async getVideoById(videoId:string) {
-        const result = await this.videoModel.findById(videoId)
-
-        if(!result) {
+    async getVideoById(videoId:string, req:Request) {
+        if(!mongoose.Types.ObjectId.isValid(videoId)) {
             throw new BadRequestException()
+        }
+ 
+        let userId = null as null | string
+
+        if(req.cookies.token) {
+            const decodedToken:IValidateJWT = jwtDecode(req.cookies.token as string)
+
+            if(!mongoose.Types.ObjectId.isValid(decodedToken.userId)) {
+                throw new BadRequestException()
+            }
+
+            userId = decodedToken.userId
+        }
+
+        const video = await this.videoModel.findById(videoId)
+
+
+        if(!video) {
+            throw new BadRequestException()
+        }
+
+        let userRating = 0
+
+        if(userId) {
+            userRating = await this.userService.getVideoUserRating(userId,video._id)
         }
 
         return {
             message:"success",
-            payload: result
+            payload: {
+                video,
+                userRating
+            }
         }
     }
 
@@ -299,9 +327,25 @@ export class VideosService {
     }
 
 
-    async getComments(videoId:string,page:number) {
+    async getComments(videoId:string,page:number, req:Request) {
         if(!mongoose.Types.ObjectId.isValid(videoId)) {
             throw new BadRequestException()
+        }
+
+        if(!mongoose.Types.ObjectId.isValid(videoId)) {
+            throw new BadRequestException()
+        }
+ 
+        let userId = null as null | string
+
+        if(req.cookies.token) {
+            const decodedToken:IValidateJWT = jwtDecode(req.cookies.token as string)
+
+            if(!mongoose.Types.ObjectId.isValid(decodedToken.userId)) {
+                throw new BadRequestException()
+            }
+
+            userId = decodedToken.userId
         }
 
         const video = await this.videoModel.findById(videoId)
@@ -310,7 +354,7 @@ export class VideosService {
             throw new BadRequestException()
         }
 
-        return this.commentService.getComments(videoId,page)
+        return this.commentService.getComments(videoId,page,userId)
     }
 
 
@@ -333,6 +377,54 @@ export class VideosService {
         return {
             message:"success",
             payload: videos
+        }
+    }
+
+
+    async getSubscribeVideos(user:IValidateJWT, query) {
+        const {page = 1} = query
+        const pageSize = 50
+
+        const usersSubcribeIds = await this.userService.getSubscribeIds(user.userId)
+
+        if(!usersSubcribeIds[0]) {
+            return {
+                message:'success',
+                payload: {
+                    videos:[]
+                }
+            }
+        }
+
+        const uploadIds = await this.userService.getUploadsIds(usersSubcribeIds)
+
+        const totalVideos = await this.videoModel.countDocuments({
+            "_id": {
+                "$in": uploadIds
+            },
+            "isPublicated": true
+        }).exec()
+
+        const totalPages = Math.ceil(totalVideos/pageSize)
+
+        let skip = (page - 1) * pageSize < 0 ? totalPages * pageSize : (page - 1) * pageSize
+            
+
+        const limit = pageSize
+
+        const videos = await this.videoModel.find({
+            "_id": {
+                "$in": uploadIds
+            },
+            "isPublicated": true
+        }).limit(limit).skip(skip).exec()
+
+        return {
+            message:"success",
+            payload: {
+                videos,
+                totalPages
+            }
         }
     }
 }

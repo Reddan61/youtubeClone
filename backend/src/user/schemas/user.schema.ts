@@ -82,6 +82,12 @@ export class User {
         rating:  0 | 1 | 2
     }[]
 
+
+    @Prop({
+        type: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+        required:true
+    })
+    subscribe: User[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

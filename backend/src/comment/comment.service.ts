@@ -5,11 +5,13 @@ import { FilterQuery, Model } from "mongoose";
 import { CommentDocument, Comment } from './schemas/comment.schema';
 import { AddCommentDto } from './dto/add-comment.dto';
 import { VideosService } from 'src/videos/videos.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class CommentService {
     constructor(
-        @InjectModel(Comment.name) private commentModel: Model<CommentDocument>
+        @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
+        private readonly userService:UserService,
     ) {}
 
     async addComment(body:AddCommentDto,user:IValidateJWT) {
@@ -19,11 +21,14 @@ export class CommentService {
             text: body.text
         })
         
-        const result = await createdComment.save()
+        const comment = await createdComment.save()
 
-        if(!result) {
+        if(!comment) {
             throw new InternalServerErrorException()
         }
+
+        const result = await this.commentModel.findById(comment._id).populate({path:"userId", select: ["avatar","_id","name","secondName"]})
+
 
         return {
             message:"success",
@@ -31,7 +36,7 @@ export class CommentService {
         }
     }
 
-    async getComments(videoId:string, page:number) {
+    async getComments(videoId:string, page:number,userId:string) {
         const pageSize = 20
         
         const totalComments = await this.commentModel.countDocuments({videoId} as FilterQuery<Comment>).exec()
@@ -44,13 +49,47 @@ export class CommentService {
 
         const result = await this.commentModel.find({videoId} as FilterQuery<Comment> ).limit(limit).skip(skip).exec()
 
+        if(!userId) {
+            return {
+                message:"success",
+                payload: {
+                    comments:result,
+                    totalPages
+                }
+            }
+        }
+
+        const ids = result.map(el => String(el._id))
+
+        if(!ids[0]) {
+            return {
+                message:"success",
+                payload: {
+                    comments:result,
+                    totalPages
+                }
+            }
+        }
+
+        const ratedComments = await this.userService.getCommentUserRating(userId,ids)
+        
         return {
             message:"success",
             payload: {
-                comments:result,
+                comments:result.map(el => {
+                    const rated = ratedComments.filter(subEl => String(subEl.commentId) === String(el._id))
+                    if(!rated[0]) return el
+
+                    return {...el.toObject(),
+                        rating: {
+                            ...el.toObject().rating,
+                            userRating: rated[0].rating
+                        }
+                    }
+                }),
                 totalPages
             }
-        }
+        }    
     }
 
 
