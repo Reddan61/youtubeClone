@@ -39,6 +39,11 @@ export class Video {
         likes:number,
         dislikes:number
     }
+
+    @Prop({
+        default: new Date()
+    })
+    date:Date
 }
 
 export const VideoSchema = SchemaFactory.createForClass(Video)

@@ -9,6 +9,7 @@ import { User, UserDocument } from "./schemas/user.schema";
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
+    //Получение профиля юзера вместе с видео (опубликованные)
     async getUserProfile(userId: string) {
         if(!mongoose.Types.ObjectId.isValid(userId)) {
             throw new BadRequestException()
@@ -44,6 +45,7 @@ export class UserService {
         return result
     }
 
+    //Добавление id видео в загруженные
     async addUpload(userId:string,videoId:string) {
         const result = await this.userModel.findOneAndUpdate(
             {_id:userId},
@@ -59,6 +61,7 @@ export class UserService {
         return result
     }
 
+    //Смена аватарки
     async avatar(file:Express.Multer.File,user:IValidateJWT) {
         if(!file) {
             throw new BadRequestException()
@@ -75,6 +78,7 @@ export class UserService {
         return result
     }
 
+    //Верификация почты
     async activate(userId:string) {
         const result = await this.userModel.findByIdAndUpdate(userId, {
             isActivated:true,
@@ -86,6 +90,7 @@ export class UserService {
         }
     }
 
+    //Изменение рейтинга для видео
     async ratingVideo(user:IValidateJWT,videoId:string,rating: 1 | 2) {
         //const userFounded = await this.userModel.findById(user.userId).where('rating').elemMatch({"videoId": videoId}).select("rating").exec()
         const userFound = await this.userModel.findById(user.userId).exec()
@@ -134,6 +139,7 @@ export class UserService {
         }
     }
 
+    //Изменение рейтинга для коммента
     async ratingComment(user:IValidateJWT,commentId:string,rating: 1 | 2) {
         const userFound = await this.userModel.findById(user.userId).exec()
 
@@ -221,7 +227,7 @@ export class UserService {
         return ratedComments
     }
 
-
+    //Подписка/Отписка
     async subscribe(userId:string,by:IValidateJWT) {
         const user = await this.userModel.findById(by.userId).exec()
 
@@ -258,10 +264,26 @@ export class UserService {
 
     async getSubscribeIds(userId:string) {
         const user = await this.userModel.findById(userId).exec()
+        
+        if(!user) {
+            throw new BadRequestException()
+        }
 
         const { subscribe } = user
 
         return subscribe
+    }
+    
+    async getLaterIds(userId:string) {
+        const user = await this.userModel.findById(userId).exec()
+
+        if(!user) {
+            throw new BadRequestException()
+        }
+
+        const { later } = user
+
+        return later
     }
 
     async getUploadsIds(userIds:User[]) {
@@ -274,5 +296,90 @@ export class UserService {
         const result = ids.map(el => el.uploadIds)
 
         return result.flat(Infinity)
+    }
+
+    //Добавление / удаление смотреть позже
+    async laterVideos(userId:string,videoId:string) {
+        const user = await this.userModel.findById(userId).exec()
+
+        const foundLaterIds = user.later.filter(el => String(el) === String(videoId))
+
+        if(!foundLaterIds[0]) {
+            await this.userModel.findByIdAndUpdate(userId, {
+                "$push": {
+                    later: videoId
+                }
+            })
+
+            return {
+                message:"success",
+                payload: {
+                    isAdded:true
+                }
+            }
+        }
+
+        await this.userModel.findByIdAndUpdate(userId, {
+            "$pullAll": {
+                later: [videoId]
+            }
+        })
+
+
+        return {
+            message:"success",
+            payload: {
+                isAdded: false 
+            }
+        }
+    }
+
+    //Получение списка подписок
+    async getSubscribes(user:IValidateJWT,query) {
+        const { page = 1 } = query
+
+        
+        const userFound = await this.userModel.findById(user.userId).exec()
+        
+        const pageSize = page <= 1 ? 7 : userFound.subscribe.length
+
+        if(!userFound)
+            throw new BadRequestException()
+
+        const totalPages = Math.ceil(userFound.subscribe.length/pageSize)
+
+        let skip = (page - 1) * pageSize < 0 ? totalPages * pageSize : (page - 1) * pageSize
+            
+
+        const limit = pageSize
+
+        const subscribes = await this.userModel.find({
+            "_id" : {
+                "$in": userFound.subscribe
+            }
+        }).select(["avatar","name","secondName"]).limit(limit).skip(skip).exec()
+
+        return {
+            message:"success",
+            payload: {
+                subscribes
+            }
+        }
+    }
+
+
+    async getLikedIds(userId:string) {
+        const user = await this.userModel.findById(userId).exec()
+
+        if(!user) {
+            throw new BadRequestException()
+        }
+
+        const { ratingVideo } = user
+
+        
+        const result = ratingVideo.filter(el => el.rating === 1).map(el => el.videoId)
+        
+        return result
     }
 }

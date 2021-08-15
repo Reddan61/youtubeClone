@@ -391,7 +391,8 @@ export class VideosService {
             return {
                 message:'success',
                 payload: {
-                    videos:[]
+                    videos:[],
+                    totalPages: 0
                 }
             }
         }
@@ -415,6 +416,100 @@ export class VideosService {
         const videos = await this.videoModel.find({
             "_id": {
                 "$in": uploadIds
+            },
+            "isPublicated": true
+        }).limit(limit).skip(skip).exec()
+
+        return {
+            message:"success",
+            payload: {
+                videos,
+                totalPages
+            }
+        }
+    }
+
+
+    async laterVideos(user:IValidateJWT, videoId:string) {
+        const video = await this.videoModel.findById(videoId).exec()
+
+        if(!video) {
+            throw new BadRequestException()
+        }
+
+        return this.userService.laterVideos(String(user.userId),videoId)
+    }
+
+    async getLaterVideos(user:IValidateJWT,query) {
+        const {page = 1} = query
+        const pageSize = 50
+
+        const laterIds = await this.userService.getLaterIds(user.userId)
+
+        if(!laterIds[0]) {
+            return {
+                message:'success',
+                payload: {
+                    videos:[],
+                    totalPages: 0
+                }
+            }
+        }
+        
+
+        const totalPages = Math.ceil(laterIds.length/pageSize)
+
+        
+        
+        let skip = (page - 1) * pageSize < 0 ? totalPages * pageSize : (page - 1) * pageSize
+            
+
+        const limit = pageSize
+
+        const videos = await this.videoModel.find({
+            "_id": {
+                "$in": laterIds
+            },
+            "isPublicated": true
+        }).limit(limit).skip(skip).exec()
+
+        return {
+            message:"success",
+            payload: {
+                videos,
+                totalPages
+            }
+        }
+    }
+
+    async getLikedVideos(user:IValidateJWT,query) {
+        const { page = 1 } = query
+        const pageSize = 50
+
+        const likedIds = await this.userService.getLikedIds(user.userId)
+
+        if(!likedIds[0]) {
+            return {
+                message:'success',
+                payload: {
+                    videos:[],
+                    totalPages: 0
+                }
+            }
+        }
+        
+
+        const totalPages = Math.ceil(likedIds.length/pageSize)
+
+        
+        let skip = (page - 1) * pageSize < 0 ? totalPages * pageSize : (page - 1) * pageSize
+            
+
+        const limit = pageSize
+
+        const videos = await this.videoModel.find({
+            "_id": {
+                "$in": likedIds
             },
             "isPublicated": true
         }).limit(limit).skip(skip).exec()

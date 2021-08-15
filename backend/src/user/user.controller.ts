@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request, Patch, UseInterceptors, UploadedFile, Post, Req, Body, Param} from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Request, Patch, UseInterceptors, UploadedFile, Post, Req, Body, Param} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { multerSettings } from 'src/core/multer';
@@ -23,9 +23,17 @@ export class UserController {
       return this.userService.avatar(file,req.user)
     }
 
+    //Подписка / отписка на юзера
     @UseGuards(JwtAuthGuard)
     @Post("/subscribe")
     async subscribe(@Req() req, @Body() body:SubscribeUserDto) {
       return this.userService.subscribe(body.userId,req.user)
+    }
+
+    //Получение списка подписок
+    @UseGuards(JwtAuthGuard)
+    @Get("/subscribe")
+    async getSubscribes(@Req() req, @Query() query) {
+      return this.userService.getSubscribes(req.user,query)
     }
 }

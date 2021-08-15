@@ -88,6 +88,10 @@ export class User {
         required:true
     })
     subscribe: User[]
+
+
+    @Prop({type:[{type: mongoose.Schema.Types.ObjectId, ref: 'Video'}]})
+    later: Video[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
