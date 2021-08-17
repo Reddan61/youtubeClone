@@ -2,14 +2,13 @@ import { IValidateJWT } from './../auth/jwt.strategy';
 import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import * as mongoose from 'mongoose'
-import { Model } from "mongoose";
+import { FilterQuery, LeanDocument, Model } from "mongoose";
 import { User, UserDocument } from "./schemas/user.schema";
 
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-    //Получение профиля юзера вместе с видео (опубликованные)
     async getUserProfile(userId: string) {
         if(!mongoose.Types.ObjectId.isValid(userId)) {
             throw new BadRequestException()
@@ -381,5 +380,54 @@ export class UserService {
         const result = ratingVideo.filter(el => el.rating === 1).map(el => el.videoId)
         
         return result
+    }
+
+    async getHistoryIds(userId:string) {
+        const user = await this.userModel.findById(userId).exec()
+
+        if(!user) {
+            throw new BadRequestException()
+        }
+
+        const { history } = user
+        
+        return history
+    }
+
+    async addToHistory(userId:string,videoId:string) {
+        await this.userModel.findByIdAndUpdate(userId, {
+            "$push": {
+                history: videoId
+            }
+        })
+
+        return {
+            message:"success"
+        }
+    }
+
+    async checkSubscribe(userId:string,myId:string) {
+        const user = await this.userModel.findById(myId).exec()
+        
+        if(!user) {
+            throw new BadRequestException()
+        }
+
+        const sub = user.subscribe.filter(el => String(el) === String(userId))
+
+        return sub[0] ? true : false
+    }
+
+    async getUserByVideoId(videoId) {
+        
+        const user = await this.userModel.find({
+            uploadIds: videoId
+        }).select(["name","secondName","avatar"]).exec()
+
+        if(!user) {
+            throw new BadRequestException()
+        }
+
+        return user[0]
     }
 }

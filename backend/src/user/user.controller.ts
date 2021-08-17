@@ -36,4 +36,5 @@ export class UserController {
     async getSubscribes(@Req() req, @Query() query) {
       return this.userService.getSubscribes(req.user,query)
     }
+
 }

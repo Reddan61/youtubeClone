@@ -92,6 +92,9 @@ export class User {
 
     @Prop({type:[{type: mongoose.Schema.Types.ObjectId, ref: 'Video'}]})
     later: Video[]
+
+    @Prop({type:[{type: mongoose.Schema.Types.ObjectId, ref: 'Video'}]})
+    history: Video[]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

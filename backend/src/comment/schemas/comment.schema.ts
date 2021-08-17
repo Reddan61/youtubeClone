@@ -20,7 +20,7 @@ export class Comment {
         ref: 'User',
         required:true
     })
-    userId: User
+    user: User
 
     @Prop({
         required:true

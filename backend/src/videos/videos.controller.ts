@@ -40,8 +40,8 @@ export class VideosController {
     @UseGuards(JwtAuthGuard)
     @Patch("/upload")
     @UseInterceptors(FileInterceptor("preview",multerSettings(true)))
-    async publicateVideo(@UploadedFile() file: Express.Multer.File, @Body() body:RegisterVideoDto) {
-        return this.videosService.public(file,body)
+    async publicateVideo(@UploadedFile() file: Express.Multer.File, @Body() body:RegisterVideoDto, @Req() req) {
+        return this.videosService.public(file,body,req.user)
     }
 
     //стрим видео
@@ -105,5 +105,12 @@ export class VideosController {
     @Get("/liked")
     async getLikedVideos(@Req() req, @Query() query) {
         return this.videosService.getLikedVideos(req.user,query)
+    }
+
+    //История видео
+    @UseGuards(JwtAuthGuard)
+    @Get("/history")
+    async getHistory(@Req() req, @Query() query) {
+      return this.videosService.getHistoryVideos(req.user,query)
     }
 }

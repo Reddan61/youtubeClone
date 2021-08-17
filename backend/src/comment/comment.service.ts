@@ -17,7 +17,7 @@ export class CommentService {
     async addComment(body:AddCommentDto,user:IValidateJWT) {
         const createdComment = new this.commentModel({
             videoId:body.videoId,
-            userId: user.userId,
+            user: user.userId,
             text: body.text
         })
         
@@ -27,7 +27,7 @@ export class CommentService {
             throw new InternalServerErrorException()
         }
 
-        const result = await this.commentModel.findById(comment._id).populate({path:"userId", select: ["avatar","_id","name","secondName"]})
+        const result = await this.commentModel.findById(comment._id).populate({path:"user", select: ["avatar","_id","name","secondName"]})
 
 
         return {
@@ -47,7 +47,7 @@ export class CommentService {
 
         const limit = pageSize
 
-        const result = await this.commentModel.find({videoId} as FilterQuery<Comment> ).limit(limit).skip(skip).exec()
+        const result = await this.commentModel.find({videoId} as FilterQuery<Comment>).populate({path:"user", select: ["avatar","_id","name","secondName"]}).limit(limit).skip(skip).exec()
 
         if(!userId) {
             return {
