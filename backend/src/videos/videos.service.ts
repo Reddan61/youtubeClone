@@ -221,8 +221,9 @@ export class VideosService {
 
     async stream(videoId:string,headers:IncomingHttpHeaders,res:any ) {
         const range = headers.range
-
+       
         if(!range) {
+            console.log('range')
             throw new BadRequestException("Requires Range Header")
         }
 
@@ -232,7 +233,7 @@ export class VideosService {
 
         const video = await this.videoModel.findById(videoId).exec()
 
-        if(!video || !video.isPublicated) {
+        if(!video) {
             throw new BadRequestException()
         }
 

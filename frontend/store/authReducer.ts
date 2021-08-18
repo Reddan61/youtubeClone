@@ -1,65 +1,76 @@
 import { makeAutoObservable } from "mobx"
+import { auth } from "./API/API"
 
 
 class Auth {
     isAuth = false
     user = null as IUser | null
-    choosedEmail = null as string | null
-
 
     constructor() {
         makeAutoObservable(this,{},{deep:true})
     }
 
     async initialUser() {
-        this.user = {
-            id:"1",
-            email:"fakeEmail@mail.ru",
-            username:"fake user",
-            avatarSrc:"/imgTest.jpg"
+        const response = await auth.me()
+        if(response.message === "success") {
+            this.user = response.payload
+            this.isAuth = true
         }
-        this.isAuth = true
     }
 
     async checkEmail(email:string) {
-        this.choosedEmail = email
+        const response = await auth.checkEmail(email)
+
+        return response
     }
 
     async registrationUser(form:IRegistarionForm) {
-        const {email,name, secondName} = form
-        const username = `${name} ${secondName}`
-        //На api отправляет
-        return new Promise((resolve,reject) => {
-            this.user = {
-                //Все с api
-                id:"1",
-                email:email,
-                username,
-                avatarSrc:"/imgTest.jpg"
-            }
-            resolve(true)
-        })
+        const response = await auth.register(form) 
+
+        return response
     }
 
-    async confirmMail(code:string) {
-        //код на api
-        this.initialUser()
+    async confirmMail(code:string,userId:string) {
+        const response = await auth.verify(code,userId)
+
+        return response
+    }
+
+    async login(email:string,password:string) {
+        const response = await auth.login(email,password)
+        if(response.message === "success") {
+            this.user = response.payload
+            this.isAuth = true
+        }
+
+        return response
+    }
+
+    async logout() {
+        const response = await auth.logout()
+
+        if(response.message === "success") {
+            this.user = null
+            this.isAuth = false
+        }
     }
 }
 
-interface IRegistarionForm {
+export interface IRegistarionForm {
     name:string,
     secondName:string,
     email:string,
     password:string,
     passwordSub:string,
+    showPassword: boolean
 }
 
 interface IUser {
     id:string,
-    avatarSrc:string,
+    avatar:string | null,
     username:string,
     email:string
 }
+
 
 export default new Auth()

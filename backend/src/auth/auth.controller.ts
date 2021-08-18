@@ -1,6 +1,6 @@
+import { Body, HttpCode, HttpStatus, Controller, Post, UseGuards, Req, Res, Response, Delete, Patch, Get, Query } from "@nestjs/common";
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RegisterAuthDto } from './dto/register-auth.dto';
-import { Body, HttpCode, HttpStatus, Controller, Post, UseGuards, Req, Res, Response, Delete, Patch } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LocalAuthGuard } from "./guards/local-auth.guard";
 
@@ -33,5 +33,19 @@ export class AuthController {
     @Patch("/verify")
     verify(@Body() body) {
         return this.authService.verify(body)
+    }
+
+    @Get("/check")
+    checkEmail(@Query() query) {
+        return this.authService.checkEmail(query.email)
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get("/me")
+    me(@Req() req) {
+        return {
+            message:"success",
+            payload: req.user
+        }
     }
 }

@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import { video } from "./API/API";
 
 class VideoReducer {
     video = null as IVideo
@@ -7,6 +8,13 @@ class VideoReducer {
         makeAutoObservable(this,{},{deep:true})
     }
     
+    async publicateVideo(formData:FormData) {
+        const response = await video.publicate(formData)
+
+        return response
+    }
+
+
     setInitialState(video:IVideo) {
         this.video = {...video}
     }

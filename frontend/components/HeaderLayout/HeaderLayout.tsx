@@ -3,7 +3,7 @@ import UploadIcon from '../svg/UploadIcon';
 import YoutubeIcon from '../svg/YoutubeIcon';
 import classes from "./headerLayout.module.scss"
 import Image from 'next/image'
-import React, {useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState } from 'react';
 import AuthButton from '../AuthButton/AuthButton';
 import ArrowBackIcon from '../svg/ArrowBackIcon';
 import Burger from '../Burger/Burger';
@@ -13,6 +13,8 @@ import authReducer from "../../store/authReducer"
 import sideBarReducer from '../../store/sideBarReducer';
 import { observer } from 'mobx-react-lite';
 import { convertAvatarSrc } from '../../assets/functions/convertAvatarSrc';
+import ProfileIcon from '../svg/ProfileIcon';
+import ExitIcon from '../svg/ExitIcon';
 
 
 interface IProps {
@@ -25,6 +27,8 @@ const HeaderLayout:React.FC<IProps> = ({children,onlyPortal}) => {
 
     const [searchText,setSearchText] = useState('')
     const [isPopUp,setPopUp] = useState(false)
+
+    const [isOpenMenu, setOpenMenu] = useState(false)
 
     //Отправка на api get search
     const sendSearch = () => {
@@ -50,6 +54,21 @@ const HeaderLayout:React.FC<IProps> = ({children,onlyPortal}) => {
             setSearchText(router.query.search_query as string)
         }
     },[])
+
+    const conditionMenu = useCallback(() => {
+        setOpenMenu(state => !state)
+    },[])
+
+    useEffect(() => {
+        if(isOpenMenu) {
+            document.documentElement.style.overflow = "hidden"
+            document.addEventListener("click",conditionMenu)
+        }
+        return () => {
+            document.documentElement.style.overflow = "auto"
+            document.removeEventListener("click",conditionMenu)
+        }
+    },[isOpenMenu])
     return <div className = {classes.headerLayout}>
         <nav className = {classes.nav}>
             <div className = {classes.container}>
@@ -84,7 +103,23 @@ const HeaderLayout:React.FC<IProps> = ({children,onlyPortal}) => {
                     {
                         authReducer.isAuth ? <>
                             <UploadIcon onClick = {() => setPopUp(true)} classModule = {classes.icon__upload}/>
-                            <Image onClick = {() => router.push(`/profile/${authReducer.user.id}`)} className ={classes.right__image} src = {convertAvatarSrc(authReducer.user.avatarSrc)} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
+                            <Image onClick = {() => {
+                                setOpenMenu(!isOpenMenu)
+                            }} className ={classes.right__image} src = {convertAvatarSrc(authReducer.user.avatar)} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
+                            {isOpenMenu && <ul className = {classes.right__list}>
+                                <li onClick = {() => {
+                                    router.push(`/profile/${authReducer.user.id}`)
+                                }}>
+                                    <ProfileIcon classModule = {classes.icon__profile}/>
+                                    Профиль
+                                </li>
+                                <li onClick = {() => {
+                                    authReducer.logout()
+                                }}>
+                                    <ExitIcon classModule = {classes.icon__exit}/>
+                                    Выйти
+                                </li>
+                            </ul>}
                         </>
                         : <div className = {classes.right__auth}>
                             <AuthButton />

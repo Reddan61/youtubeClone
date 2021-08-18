@@ -22,17 +22,18 @@ const VerifyEmail = () => {
 
     const linkButtonHandler = () => {
         setLoading(true)
-        setTimeout(() => {
-            setLoading(false)
-            setStartAnimation(false);
-        }, 1000)
+        setStartAnimation(false);
     }
 
-    const submit = (values, { setSubmitting }) => {
-        
-        authReducer.confirmMail(values.code)
+    const submit = async (values, { setSubmitting }) => {
+        const response = await authReducer.confirmMail(values.code,router.query.id as string)
+
+        if(response.message === "success") {
+            Router.push("/login")
+        } else {
+            alert("Что-то пошло не так!")
+        }
         setSubmitting(false)
-        //Router.push("/")
     }
     return <div className={classes.verify}>
         {isLoading && <ProgressBar classModule={classes.verify__progress} />}
@@ -55,6 +56,7 @@ const VerifyEmail = () => {
                     }}
                     onExited = {() => {
                         if(!startAnimation) {
+                            setLoading(false)
                             Router.push("/register")
                         }
                     }}

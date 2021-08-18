@@ -32,9 +32,15 @@ export class UserService {
         return result
     }
 
+    async getUserById(userId:string) {
+        const result = await this.userModel.findById(userId).exec()
+
+        return result
+    }
+
     async findByEmail(email:string) {
         const result = await this.userModel.find({email}).exec()
-        return result
+        return result[0]
     }
 
     async createUser(user) {

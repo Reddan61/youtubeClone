@@ -15,19 +15,19 @@ export class AuthService {
     async validateUser(email:string,password:string) {
         const user = await this.userService.findByEmail(email)
 
-        if(!user[0]) {
+        if(!user) {
             throw new HttpException("Пользователя не существует",HttpStatus.FORBIDDEN)
         }
 
-        const isCurrect = await bcrypt.compare(password, user[0].passwordHash)
+        const isCurrect = await bcrypt.compare(password, user.passwordHash)
         if(user && isCurrect) {
             //const {passwordHash, ...result} = user[0].toObject()
             return {
-                _id: user[0]._id,
-                name:user[0].name,
-                secondName: user[0].secondName,
-                email: user[0].email,
-                avatar: user[0].avatar
+                _id: user._id,
+                name:user.name,
+                secondName: user.secondName,
+                email: user.email,
+                avatar: user.avatar
             }
         }
         return null
@@ -92,7 +92,7 @@ export class AuthService {
             from: 'admin@mail.ru',
             to:result.email,
             subject:"Подтверждение почты",
-            hash: result.verifyHash,
+            userId: result._id,
             code
         })
 
@@ -107,7 +107,8 @@ export class AuthService {
                 id: result.id,
                 name: result.name,
                 secondName:result.secondName,
-                email:result.email
+                email:result.email,
+                avatar: result.avatar
             }
         }
     }
@@ -123,16 +124,17 @@ export class AuthService {
     }
 
     async verify(body) {
-        if(!body.code || !body.hash) {
-            throw new BadRequestException()
-        }
-        const user = await this.userService.getUserByHashCode(body.hash)
-
-        if(!user[0]) {
+        if(!body.code || !body.userId) {
             throw new BadRequestException()
         }
 
-        const isCurrect = await bcrypt.compare(String(body.code), user[0].verifyHash)
+        const user = await this.userService.getUserById(body.userId)
+
+        if(!user || user.isActivated) {
+            throw new BadRequestException()
+        }
+
+        const isCurrect = await bcrypt.compare(String(body.code), user.verifyHash)
         
         if(!isCurrect) {
             throw new HttpException({
@@ -141,7 +143,7 @@ export class AuthService {
             },HttpStatus.BAD_REQUEST)
         }
 
-        const result = await this.userService.activate(user[0]._id)
+        const result = await this.userService.activate(user._id)
 
         if(result.message !== "success") {
             throw new InternalServerErrorException()
@@ -152,4 +154,22 @@ export class AuthService {
         }
     }
 
+    async checkEmail(email:string) {
+        if(!email) {
+            throw new BadRequestException()
+        }
+
+        const user = await this.userService.findByEmail(email)
+
+        if(!user) {
+            throw new BadRequestException()
+        }
+
+        return {
+            message:"success",
+            payload: {
+                email:user.email
+            }
+        }
+    }
 }

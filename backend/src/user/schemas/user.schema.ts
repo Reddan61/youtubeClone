@@ -44,9 +44,9 @@ export class User {
     uploadIds: Video[]
 
     @Prop({
-        default:""
+        default:null
     })
-    avatar:string
+    avatar:string | null
 
     @Prop({
         type: [

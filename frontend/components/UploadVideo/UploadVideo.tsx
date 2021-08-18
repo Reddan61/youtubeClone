@@ -9,6 +9,9 @@ import UploadCircleIcon from "../svg/UploadCircleIcon";
 import CrossIcon from "../svg/СrossIcon";
 import classes from "./UploadVideo.module.scss"
 import * as Yup from 'yup';
+import axios from "axios";
+import { instance } from "../../store/API/API";
+import videoReducer from "../../store/videoReducer";
 
 interface IProps {
     setPopUp: (bool:boolean) => void
@@ -21,9 +24,14 @@ const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
     const [isBrowser,setBrowser] = useState(false)
     const [title,setTitle] = useState('')
     const [imageBadge,setImageBadge] = useState<File | null>(null)
+    const [videoId,setVideoId] = useState<null | string>(null)
     const [isUploadedVideo,setIsUploadedVideo] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
     const formRef = useRef(null)
+
+
+
+    const progressRef = useRef(0)
 
     useEffect(() => {
         ref.current = document.createElement("div");
@@ -41,23 +49,57 @@ const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
         setTitle(e.target.value)
     }
 
-    const videoUploadHandler = (e:any) => {
+    const videoUploadHandler = async (e:any) => {
         e.preventDefault()
         
         const extensions = ["video/mp4"]
         const file = e.target.files ? e.target.files :  e.dataTransfer.files
         
-        if(extensions.includes(file[0].type))
-            setIsUploadedVideo(true)
-        // Отправить видеофайл на сервер
-        // + лоадер сделать
+        if(!extensions.includes(file[0].type)) {
+            alert("Неправильный формат!")
+            return
+        }
+
+        const formdata = new FormData()
+        formdata.set("video",file[0])
+        instance.post("videos/upload",formdata, {
+            onUploadProgress: (progressEvent) => {
+                const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
+                if (totalLength !== null) {
+                    progressRef.current = (Math.round( (progressEvent.loaded * 100) / totalLength ))
+                }
+            }
+        }).then(response => {
+            const data = response.data
+            if(response.data.message === "success") {
+                setVideoId(data.payload.id)
+            }
+        })
+        setIsUploadedVideo(true)
     }
-    const submit = () => {
+
+
+    const submit = async (values, {setSubmitting}) => {
         if(!imageBadge) {
             alert("Выберите значок")
             return
         }
-        //Отправка на api
+        const formData = new FormData()
+
+        formData.set("name",values.name)
+        formData.set("description",values.description)
+        formData.set("videoId",videoId)
+        formData.set("preview",imageBadge)
+
+        const response = await videoReducer.publicateVideo(formData)
+
+        if(response.message === "success") {
+            setPopUp(false)
+        } else {
+            alert("Что-то пошло не так!")
+        }
+        
+        setSubmitting(false)
     }
     return <>
         {isBrowser && ReactDOM.createPortal(<div className = {classes.upload}>
@@ -127,7 +169,7 @@ const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
                         </div>
                         <div className = {classes.upload__right}>
                             <div className = {classes.upload__player}>
-                                <Player src = {"/testvideo.mp4"}/>
+                                <Player id = {videoId}/>
                             </div>
                         </div>
                     </>
@@ -156,9 +198,12 @@ const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
                 </div>
                 {isUploadedVideo &&
                     <div className = {classes.upload__bottom}>
-                        <span>{"Загружено 47%"}</span>
+                        <span>{`Загружен ${progressRef.current}%`}</span>
                         <div className = {classes.upload__button_next}>
-                            <BlueButton onClick = {() => formRef.current.handleSubmit()} label = {"Далее"}/>
+                            <BlueButton 
+                                disabled = {formRef.current?.isSubmitting}
+                                onClick = {() => formRef.current.handleSubmit()} label = {"Далее"}
+                            />
                         </div>
                     </div>
                 }

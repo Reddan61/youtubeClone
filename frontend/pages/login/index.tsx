@@ -16,7 +16,7 @@ const Index = () => {
     return <>
     {
         showPage &&
-            <LoginPage />
+        <LoginPage />
     }
     </>
 }

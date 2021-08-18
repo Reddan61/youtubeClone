@@ -128,6 +128,7 @@
         & .right {
             @include mixins.flexBox();
             height: inherit;
+            position: relative;
             
             & .icon__upload {
                 width:15px;
@@ -152,6 +153,30 @@
                     display: block;
                 }
             }
+            &__list {
+                position: absolute;
+                z-index: 6;
+                background-color: white;
+                top: 70px;
+                left: -140px;
+                font-size: 14px;
+                letter-spacing: .2px;
+                font-weight: 500;
+                color: vars.$secondary;
+                > li {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    padding: 10px 60px;
+                    gap: 15px;
+                    max-width: 100%;
+                    overflow: hidden;
+                    &:hover {
+                        background-color: rgba($color: black, $alpha: 0.1);
+                    }
+                }
+            }
         }
     }
    
@@ -163,6 +188,21 @@
     min-width: 400px;
     @media(max-width:400px) {
         width: 400px;
+    }
+}
+
+
+.icon {
+    &__profile {
+        width: 24px;
+        height: 24px;
+        fill: vars.$secondary;
+    }
+
+    &__exit {
+        width: 24px;
+        height: 24px;
+        fill: vars.$secondary;
     }
 }
 

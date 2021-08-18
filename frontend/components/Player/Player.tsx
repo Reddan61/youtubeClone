@@ -5,11 +5,11 @@ import PlayIcon from '../svg/PlayIcon'
 import classes from "./Player.module.scss"
 
 interface IProps {
-    src:string
+    id:string
 }
 
 
-const Player:React.FC<IProps> = ({src}) => {
+const Player:React.FC<IProps> = ({id}) => {
     const [isPlaying,setIsPlaying] = useState(false)
     const [duration,setDuration] = useState(["00:00","00:00"])
     const [isVisibleControls,setVisibleControls] = useState(false)
@@ -92,6 +92,11 @@ const Player:React.FC<IProps> = ({src}) => {
     },[])
 
     useEffect(() => {
+        videoRef.current.src = `http://localhost:8888/videos/stream/${id}`
+        //videoRef.current.src = `/testvideo.mp4`
+    },[id])
+
+    useEffect(() => {
         const video = videoRef.current
         calculateHeight()
         let interval = setInterval(() => {
@@ -147,7 +152,7 @@ const Player:React.FC<IProps> = ({src}) => {
             </div>
         </CSSTransition>    
         <video loop = {false} ref = {videoRef} width = {'100%'} height = {"100%"}>
-            <source src = {src} />
+            <source />
             Браузер не поддерживает плеер
         </video>
     </div>

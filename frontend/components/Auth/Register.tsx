@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import BlueButton from '../Buttons/BlueButton/BlueButton';
 import LinkButton from '../Buttons/LinkButton/LinkButton';
 import CheckBox from '../Formik/CheckBox';
@@ -17,18 +17,24 @@ import WithAuth from '../HOC/withAuth';
 
 
 const Register = () => {
-
     const [startExitAnimation,setStartExitAnimation] = useState(true)
     const [isLoading,setLoading] = useState(false)
 
+    const registerInfoRef = useRef<null | {id:string,email:string}>(null)
+
     const submit = async (values) => {
         setLoading(true)
-        await authReducer.registrationUser(values)
+        const response = await authReducer.registrationUser(values)
+        if(response.message === "error") {
+            alert("Что-то пошло не так!")
+            setLoading(false)
+            return
+        }
+        registerInfoRef.current = {
+            id: response.data.payload.id,
+            email:response.data.payload.email
+        }
         setStartExitAnimation(false)
-        setLoading(false)
-        setTimeout(() => {
-            Router.push(`/verifyemail?email=${values.email}&hash=123`)
-        },300)
     }
     return <div className = {classes.register}>
         {isLoading && <ProgressBar classModule = {classes.register__progress}/>}
@@ -50,9 +56,10 @@ const Register = () => {
                         exit:classes.animation__exit,
                         exitActive:classes.animation__exit_active
                     }}
-                    // onExited = {() => {
-                    //     Router.push('/verifyemail')
-                    // }}
+                    onExited = {() => {
+                        Router.push(`/verifyemail?email=${registerInfoRef.current.email}&id=${registerInfoRef.current.id}`)
+                        setLoading(false)               
+                    }}
                     unmountOnExit
                 >
                     <div className = {classes.form}>

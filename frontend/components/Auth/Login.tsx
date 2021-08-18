@@ -18,14 +18,11 @@ import WithAuth from "../HOC/withAuth";
 
 const LoginPage = () => {
     const [isLoading,setLoading] = useState(false)
+    const [email,setEmail] = useState<null | string>(null)
     
     const handleClick = (bool:boolean) => {
-        setLoading(true);
-        setTimeout(() => {
-            setTimeout(() =>{
-                setLoading(false);
-            },1000)
-        },2000)
+        setLoading(true)
+        setEmail(null)
     }
 
     return <div className = {classes.login}>
@@ -33,13 +30,13 @@ const LoginPage = () => {
         <div className = {classes.login__container}>
             {isLoading && <div className = {classes.login__loading}></div>}
             <div className = {classes.login__top}>
-                {authReducer.choosedEmail ? 
+                {email ? 
                     <>
                         <GoogleIcon classModule = {classes.icon__google}/>
                         <h1>Добро пожаловать!</h1>
                         <div className = {classes.login__email} onClick = {() => handleClick(false)}>
                             <UserAvatarIcon classModule = {classes.icon__avatar}/>
-                            <span>{authReducer.choosedEmail}</span>
+                            <span>{email}</span>
                             <ArrowDownIcon classModule = {classes.icon__arrowDown}/>
                         </div>
                     </>
@@ -52,27 +49,34 @@ const LoginPage = () => {
                 }
             </div>
             <div className = {classes.forms}>
-                <CSSTransition in = {authReducer.choosedEmail === null} timeout = {300} unmountOnExit
-                    classNames = {{
-                        enter:classes.animation__enter,
-                        enterActive:classes.animation__enter_active,
-                        exit:classes.animation__exit,
-                        exitActive:classes.animation__exit_active
-                    }}>
-                    <div className = {classes.login__form}>
-                        <FirstForm setLoading = {setLoading}/>
-                    </div>
-                </CSSTransition>
-                <CSSTransition in = {authReducer.choosedEmail !== null} timeout = {300} unmountOnExit
+                <CSSTransition in = {email === null} timeout = {300} unmountOnExit
                     classNames = {{
                         enter:classes.animation__enter,
                         enterActive:classes.animation__enter_active,
                         exit:classes.animation__exit,
                         exitActive:classes.animation__exit_active
                     }}
+                    onExit = {() => {
+                        setLoading(false)
+                    }}
+                >
+                    <div className = {classes.login__form}>
+                        <FirstForm setLoading = {setLoading} setEmail = {setEmail} />
+                    </div>
+                </CSSTransition>
+                <CSSTransition in = {email !== null} timeout = {300} unmountOnExit
+                    classNames = {{
+                        enter:classes.animation__enter,
+                        enterActive:classes.animation__enter_active,
+                        exit:classes.animation__exit,
+                        exitActive:classes.animation__exit_active
+                    }}
+                    onExit = {() => {
+                        setLoading(false)
+                    }}
                 >
                     <div className = {`${classes.login__form} ${classes.login__form_second}`}>
-                        <SecondForm setLoading = {setLoading}/>
+                        <SecondForm setLoading = {setLoading} email = {email}/>
                     </div>
                 </CSSTransition> 
             </div>
@@ -84,19 +88,23 @@ interface IFormsProps {
     setLoading: (bool:boolean) => void
 }
 
-const FirstForm:React.FC<IFormsProps> = ({setLoading}) => {
-    const submit = (values) => {
+const FirstForm:React.FC<IFormsProps & {setEmail:(value:null | string) => void}> = ({setLoading, setEmail}) => {
+    const submit = async (values, {setSubmitting}) => {
         setLoading(true)
-        setTimeout(() => {
-            authReducer.checkEmail(values.email)
-            setLoading(false);
-           
-        },2000)
+        const response = await authReducer.checkEmail(values.email)  
+        if(response.message === "success") {
+            setEmail(response.payload.email)
+        } else {
+            alert("Что-то пошло не так!")
+            setEmail(null)
+        }
+        setLoading(false)
+        setSubmitting(false)
     }
 
     return <>
         <Formik
-            initialValues={{ email: 'mail@mail.ru' }}
+            initialValues={{ email: '' }}
             onSubmit={submit}
             validationSchema={firstFormSchema}
         >
@@ -119,14 +127,17 @@ const FirstForm:React.FC<IFormsProps> = ({setLoading}) => {
     </>
 }
 
-const SecondForm:React.FC<IFormsProps> = ({setLoading}) => {
+const SecondForm:React.FC<IFormsProps & {email:string}> = ({setLoading, email}) => {
 
-    const submit = (values, {setSubmitting}) => {
+    const submit = async (values, {setSubmitting}) => {
         setLoading(true)
-        setTimeout(() => {
-            authReducer.initialUser()
-            setLoading(false);
-        },2000)
+
+        const response = await authReducer.login(email,values.password)
+        if(response.message !== "success") {
+            alert("Что-то пошло не так!")
+        }
+        setLoading(false)
+
         setSubmitting(false)
     }
 
