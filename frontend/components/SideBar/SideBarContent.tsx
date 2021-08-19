@@ -21,18 +21,19 @@ interface IProps {
 const SideBarContent:React.FC<IProps> = ({isPortal = false}) => {
     const [path,setPath] = useState(null)
     const [isSubOpen,setIsSubOpen] = useState(false)
-    
+
     const urlParse = () => {
         const pathname = Router.pathname; 
         const parsedPath = pathname.slice(1,pathname.indexOf('/',1) !== -1 ?pathname.indexOf('/',1) : pathname.length );
 
         return parsedPath
     }
+
     const subListHandler = async () => {
         if (!isSubOpen) {
-            await sideBarReducer.addSubscribers()
+            await sideBarReducer.getSubscribes(2)
         } else {
-            await sideBarReducer.getInitialSub()
+            await sideBarReducer.getSubscribes(1)
         }
         setIsSubOpen(!isSubOpen)
     }
@@ -42,7 +43,7 @@ const SideBarContent:React.FC<IProps> = ({isPortal = false}) => {
 
     useEffect(() => {
         (async function() {
-            await sideBarReducer.getInitialSub()
+            await sideBarReducer.getSubscribes(1)
         })()
 
         setPath(urlParse())
@@ -97,20 +98,22 @@ const SideBarContent:React.FC<IProps> = ({isPortal = false}) => {
             <div >
                 <ul className = {classes.list}>
                     {
-                        sideBarReducer.subscribers.map(el => {
-                            return <SubscribeItem key = {el.userId}
-                                userdId = {el.userId} avatarSrc = {el.avatarSrc}
-                                nickname = {el.nickname} 
+                        sideBarReducer.subscribers?.map(el => {
+                            return <SubscribeItem key = {el._id}
+                                _id = {el._id} avatar = {el.avatar}
+                                name = {el.name} secondName = {el.secondName} 
                             />
                         }
                     )
                     }
                 </ul>
             </div>
-            <div onClick = {subListHandler} className = {classes.subscribers__button}>
-                <div className = {`${classes.arrow} ${isSubOpen && classes.arrow_active}`}></div>
-                <span className = {`showTitle`}>{isSubOpen ? "Свернуть" : `Показать еще ${sideBarReducer.moreCountSub} каналов`}</span>
-            </div>
+            { sideBarReducer.moreCountSub !== 0 &&
+                <div onClick = {subListHandler} className = {classes.subscribers__button}>
+                        <div className = {`${classes.arrow} ${isSubOpen && classes.arrow_active}`}></div>
+                        <span className = {`showTitle`}>{isSubOpen ? "Свернуть" : `Показать еще ${sideBarReducer.moreCountSub} каналов`}</span>
+                </div>
+            }
         </div>
     </div>
     }
@@ -130,16 +133,17 @@ const SideBarContent:React.FC<IProps> = ({isPortal = false}) => {
 }
 
 interface ISiberBarItemProps {
-    userdId:string,
-    avatarSrc:string,
-    nickname:string
+    _id:string,
+    avatar:string,
+    name:string,
+    secondName:string
 }
 
-const SubscribeItem:React.FC<ISiberBarItemProps> = ({userdId,avatarSrc,nickname}) => {
+const SubscribeItem:React.FC<ISiberBarItemProps> = ({_id,avatar,name,secondName}) => {
 
-    return <li onClick = {() => Router.push(`/profile/${userdId}`)} className = {`${classes.list__item}`}>
-        <Image className = {classes.subscribers__image} src = {convertAvatarSrc(avatarSrc)} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
-        <span className = {`showTitle`}>{nickname}</span>
+    return <li onClick = {() => Router.push(`/profile/${_id}`)} className = {`${classes.list__item}`}>
+        <Image className = {classes.subscribers__image} loader = {() => convertAvatarSrc(avatar)} src = {convertAvatarSrc(avatar)} layout = {"fixed"} alt = {"picture"} width = {25} height = {25}/>
+        <span className = {`showTitle`}>{`${name} ${secondName}`}</span>
     </li>
 }
 

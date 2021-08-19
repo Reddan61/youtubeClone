@@ -3,5 +3,5 @@ export function convertAvatarSrc(src:string | null) {
         return "/avatar.jpg"
     }
 
-    return src
+    return `http://localhost:8888/${src}`
 }

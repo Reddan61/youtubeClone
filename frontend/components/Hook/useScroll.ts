@@ -9,7 +9,7 @@ export const useScroll = (callback:() => Promise<void | any>) => {
     let oldPercent = 0
     let oldScrollPosition = 0
 
-    const addNewVideosOnScroll = useCallback((e:any) => {
+    const addNewVideosOnScroll = useCallback(async (e:any) => {
         //При первой загрузке страницы скролл в топ       
         if(isFirstRef.current) {
             setTimeout(() => {
@@ -29,16 +29,9 @@ export const useScroll = (callback:() => Promise<void | any>) => {
             oldPercent = percent;
             requestRef.current = true;
             setLoading(true)
-            //Должно после ответа api = false
-            //Сделать что если на сервере нет больше контента то isloading всегда false
-            callback().then(() => {
-                
-                requestRef.current = false;
-                setLoading(false)
-            })
-            // setTimeout(() => {
-            //     
-            // },1000)
+            await callback()
+            requestRef.current = false;
+            setLoading(false)
         }
         
     },[])

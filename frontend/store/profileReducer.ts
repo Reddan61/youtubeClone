@@ -1,106 +1,83 @@
+import { IUser } from './authReducer';
+import { profile } from './API/API';
 import { makeAutoObservable } from "mobx"
-import { IVideoList } from "./videoListReducer"
+import { IVideo } from "./videoListReducer"
 
 class ProfileReducer {
     user = null as IProfile
+    videos = null as IVideo[] | null
+    page = 1
+    totalPages = 1
 
     constructor() {
         makeAutoObservable(this,{},{deep:true})
     }
 
-    setInitialState(user:IProfile) {
+    setInitialState(user:IProfile,videos:IVideo[],totalPages) {
         this.user = user
+        this.videos = videos
+        this.totalPages = totalPages
     }
 
-    async getUser(id:string) {
-        this.user = {...fakeUser}
+    async getUser(userId:string) {
+        const response = await profile.getProfile(userId)
+
+        //for server render
+        if(response.message === "success") {
+            this.user = response.payload
+        }
         
-        return {
-            user:this.user
-        }
+        return response
     }
-    //Добавление еще видео в видео лист
-    async addVideoList() {
-        await new Promise((resolve,reject) => { 
-            setTimeout(() => {
-                    this.user.videoList.push(...fakeUser.videoList)
-                    resolve(true)
-            },1000)
-        })
+
+
+    async getVideoProfile(page:number) {
+        const response = await profile.getVideoProfile(this.user._id,page)
+
+
+        return response
+    }
+
+    async addVideoProfile() {
+        if(this.page >= this.totalPages) {
+            return
+        }
+
+        const response = await profile.getVideoProfile(this.user._id,++this.page)
+
+        if(response.message === "success") {
+            this.videos.push(...response.payload.videos)
+     
+            this.totalPages = response.payload.totalPages
+
+            //Если не пришло больше видео
+            if(!response.payload.videos[0]) {
+                this.totalPages = 0
+            }
+        }
+
+        return response
+    }
+  
+    async changeAvatar(file:File) {
+        const response = await profile.changeAvatar(file)
+
+        if(response.message === "success") {
+            this.user.avatar = response.payload.avatar
+        }
+
+        return response
     }
 }
 
 
-const fakeUser = {
-    id:"1",
-    nickname:"nickname",
-    avatarSrc:"/imgTest.jpg",
-    subscribersCount:200124,
-    videoList: [
-        {
-            id:"1",
-            userId:"1",
-            previewsSrc: ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"],
-            videoTitle: "Title",
-             videoPreview:"/imgTest.jpg",
-            author:"author",
-            viewersCount:222222,
-            date: String(new Date("2021-06-01")),
-            delay: "11:33"
-        },
-        {
-            id:"2",
-            userId:"2",
-            previewsSrc: ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"],
-            videoTitle: "Title",
-             videoPreview:"/imgTest.jpg",
-            author:"author",
-            viewersCount:222222,
-            date: String(new Date("2021-06-01")),
-            delay: "11:33"
-        },
-        {
-            id:"3",
-            userId:"3",
-            previewsSrc: ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"],
-            videoTitle: "Title",
-             videoPreview:"/imgTest.jpg",
-            author:"author",
-            viewersCount:222222,
-            date: String(new Date("2021-06-01")),
-            delay: "11:33"
-        },
-        {
-            id:"4",
-            userId:"4",
-            previewsSrc: ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"],
-            videoTitle: "Title",
-             videoPreview:"/imgTest.jpg",
-            author:"author",
-            viewersCount:222222,
-            date: String(new Date("2021-06-01")),
-            delay: "11:33"
-        },
-        {
-            id:"5",
-            userId:"5",
-            previewsSrc: ["/testReviewVideo/img1.jpg","/testReviewVideo/img2.jpg","/testReviewVideo/img3.jpg","/testReviewVideo/img4.jpg"],
-            videoTitle: "Title",
-             videoPreview:"/imgTest.jpg",
-            author:"author",
-            viewersCount:222222,
-            date: String(new Date("2021-06-01")),
-            delay: "11:33"
-        }
-    ]
-}
 
 export interface IProfile {
-    id:string,
-    nickname:string,
-    avatarSrc:string,
-    subscribersCount:number,
-    videoList: IVideoList[]
+    _id:string,
+    name:string,
+    secondName:string,
+    avatar:string,
+    subscribersCount:number
 }
 
 export default new ProfileReducer()

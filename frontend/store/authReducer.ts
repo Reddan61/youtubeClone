@@ -65,11 +65,11 @@ export interface IRegistarionForm {
     showPassword: boolean
 }
 
-interface IUser {
-    id:string,
+export interface IUser {
+    _id:string,
     avatar:string | null,
-    username:string,
-    email:string
+    name:string,
+    secondName:string
 }
 
 

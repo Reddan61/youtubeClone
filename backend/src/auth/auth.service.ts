@@ -1,9 +1,10 @@
-import { RegisterAuthDto } from './dto/register-auth.dto';
-import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from "@nestjs/common";
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException } from "@nestjs/common";
+import { RegisterAuthDto } from './dto/register-auth.dto';
 import { UserService } from "src/user/user.service";
 import { sendEmail } from 'src/utils/email';
+import { IValidateJWT } from './jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -169,6 +170,26 @@ export class AuthService {
             message:"success",
             payload: {
                 email:user.email
+            }
+        }
+    }
+
+
+    async me(user:IValidateJWT) {
+        const userFound = await this.userService.getUserById(user.userId)
+
+        if(!userFound) {
+            throw new BadRequestException()
+        }
+
+        return {
+            message:"success",
+            payload: {
+                _id: userFound._id,
+                avatar: userFound.avatar,
+                name:userFound.name,
+                secondName: userFound.secondName,
+                email: userFound.email
             }
         }
     }

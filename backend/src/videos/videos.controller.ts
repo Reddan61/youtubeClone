@@ -44,6 +44,11 @@ export class VideosController {
         return this.videosService.public(file,body,req.user)
     }
 
+    @Get("/upload")
+    async getProfileVideos(@Query() query) {
+        return this.videosService.getProfileVideos(query)
+    }
+
     //стрим видео
     @Get("/stream/:id")
     async video(@Param("id") param, @Headers() headers, @Res() res) {

@@ -23,6 +23,9 @@ export class Video {
     
     @Prop()
     screenshots:string[]
+
+    @Prop() 
+    duration:number
     
     @Prop({
         required:true,

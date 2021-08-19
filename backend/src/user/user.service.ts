@@ -14,15 +14,22 @@ export class UserService {
             throw new BadRequestException()
         }
 
-        const result = await this.userModel.findById(userId).select(["uploadIds","avatar","_id","name","secondName"]).populate({path:"uploadIds",match: { isPublicated: true}}).exec()
+        //const result = await this.userModel.findById(userId).select(["uploadIds","avatar","_id","name","secondName"]).populate({path:"uploadIds",match: { isPublicated: true},populate: {path:'author',select:["avatar","_id","name","secondName"]}}).exec()
+        const result = await this.userModel.findById(userId).select(["avatar","_id","name","secondName"]).exec()
 
         if(!result) {
             throw new BadRequestException()
         }
 
+        const subscribersCount = await this.getSubscribersCount(result._id)
+
+
         return {
             message:"success",
-            payload: result
+            payload: {
+                ...result.toObject(),
+                subscribersCount
+            }
         }
     }
     
@@ -80,7 +87,10 @@ export class UserService {
         }).select("avatar")
 
 
-        return result
+        return {
+            message:"success",
+            payload:result
+        }
     }
 
     //Верификация почты
@@ -367,7 +377,8 @@ export class UserService {
         return {
             message:"success",
             payload: {
-                subscribes
+                subscribes,
+                next: userFound.subscribe.length - 7 < 0 ? 0 : userFound.subscribe.length - 7
             }
         }
     }
@@ -435,5 +446,13 @@ export class UserService {
         }
 
         return user[0]
+    }
+
+    async getSubscribersCount(userId) {
+        const user = await this.userModel.find({
+            subscribe: userId
+        }).exec()
+
+        return user.length
     }
 }

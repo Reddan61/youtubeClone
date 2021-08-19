@@ -18,6 +18,7 @@ import { CommentService } from 'src/comment/comment.service';
 import { AddCommentDto } from 'src/comment/dto/add-comment.dto';
 import { RatingCommentDto } from 'src/comment/dto/rating-comment.dto';
 import { Request } from 'express';
+import { User } from 'src/user/schemas/user.schema';
 
 
 @Injectable()
@@ -138,6 +139,7 @@ export class VideosService {
                 description:info.description,
                 previewImage: file.path,
                 screenshots: screenshots.map(el => `uploads\\${el}`),
+                duration: await this.getVideoDuration(video.url),
                 isPublicated:true
             },
             {
@@ -576,6 +578,57 @@ export class VideosService {
         const videos = await this.videoModel.find({
             "_id": {
                 "$in": historyIds
+            },
+            "isPublicated": true
+        }).populate({path:"author", select: ["avatar","_id","name","secondName"]}).limit(limit).skip(skip).exec()
+
+        return {
+            message:"success",
+            payload: {
+                videos,
+                totalPages
+            }
+        }
+    }
+
+
+    async getProfileVideos(query) {
+        const { page = 1, userId } = query
+        if(!mongoose.Types.ObjectId.isValid(userId)) {
+            throw new BadRequestException()
+        }
+        const pageSize = 50
+
+        const userFound = await this.userService.getUserById(userId)
+
+        if(!userFound) {
+            throw new BadRequestException()
+        }
+
+        const uploadsIds = userFound.uploadIds
+
+        if(!uploadsIds[0]) {
+            return {
+                message:'success',
+                payload: {
+                    videos:[],
+                    totalPages: 0
+                }
+            }
+        }
+        
+
+        const totalPages = Math.ceil(uploadsIds.length/pageSize)
+
+        
+        let skip = (page - 1) * pageSize < 0 ? totalPages * pageSize : (page - 1) * pageSize
+            
+
+        const limit = pageSize
+
+        const videos = await this.videoModel.find({
+            "_id": {
+                "$in": uploadsIds
             },
             "isPublicated": true
         }).populate({path:"author", select: ["avatar","_id","name","secondName"]}).limit(limit).skip(skip).exec()

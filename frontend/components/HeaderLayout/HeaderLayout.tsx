@@ -105,10 +105,10 @@ const HeaderLayout:React.FC<IProps> = ({children,onlyPortal}) => {
                             <UploadIcon onClick = {() => setPopUp(true)} classModule = {classes.icon__upload}/>
                             <Image onClick = {() => {
                                 setOpenMenu(!isOpenMenu)
-                            }} className ={classes.right__image} src = {convertAvatarSrc(authReducer.user.avatar)} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
+                            }} className ={classes.right__image} loader = {() => convertAvatarSrc(authReducer.user.avatar)} src = {convertAvatarSrc(authReducer.user.avatar)} alt = {"avatar"} layout = {"fixed"} width = {"32"} height = {"32"}/>
                             {isOpenMenu && <ul className = {classes.right__list}>
                                 <li onClick = {() => {
-                                    router.push(`/profile/${authReducer.user.id}`)
+                                    router.push(`/profile/${authReducer.user._id}`)
                                 }}>
                                     <ProfileIcon classModule = {classes.icon__profile}/>
                                     Профиль

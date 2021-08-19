@@ -105,3 +105,61 @@ export const video = {
         }
     }
 }
+
+
+export const profile = {
+    getProfile: async (userId:string) => {
+        try {
+            const response = await instance.get(`user/profile/${userId}`)
+           
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    getVideoProfile: async (userId:string,page:number) => {
+        try {
+            const response = await instance.get(`videos/upload?userId=${userId}&page=${page}`)
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    changeAvatar: async (file:File) => {
+        try {
+            const formData = new FormData()
+
+            formData.set("file",file)
+
+            const response = await instance.patch(`user/avatar`,formData)
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    }
+}
+
+
+export const sideBar = {
+    getSubscribers: async (page:number) => {
+        try {
+            const response = await instance.get(`user/subscribe?page=${page}`)
+           
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    }
+}
