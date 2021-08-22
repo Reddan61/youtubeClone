@@ -9,14 +9,7 @@ import profileReducer, { IProfile } from '../../store/profileReducer'
 import { convertAvatarSrc } from '../../assets/functions/convertAvatarSrc'
 import { observer } from 'mobx-react-lite'
 import { IVideo } from '../../store/videoListReducer'
-
-
-
-//
-// TODO:Сделать кнопку подписки!!!!
-//
-
-
+import { useRouter } from 'next/router'
 
 
 const Profile:React.FC<{
@@ -27,6 +20,7 @@ const Profile:React.FC<{
     const [isLoading] = useScroll(profileReducer.addVideoProfile.bind(profileReducer))
     
     const inputRef = useRef<HTMLInputElement>(null)
+    const router = useRouter()
 
     const avatarUpload = async (e:any) => {
         e.preventDefault()
@@ -49,6 +43,17 @@ const Profile:React.FC<{
     useEffect(() => {
         profileReducer.setInitialState(props.profile,props.videos,props.totalPages)
     },[])
+
+    useEffect(() => {
+        (async function() {
+            if(!router.query.id) {
+                alert("Что-то пошло не так!")
+                return
+            }
+            await profileReducer.getUser(router.query.id as string)
+            await profileReducer.getVideoProfile(1)
+        })() 
+    },[router.query.id])
     
     return <div className = {classes.profile}>
         <div className = {classes.profile__container}>
@@ -87,17 +92,13 @@ const Profile:React.FC<{
                         profileReducer.videos?
                             profileReducer.videos.map(el => {
                                 return <VideoPreview key = {el._id} little = {true} hideUsername = {true}
-                                    _id = {el._id} author = {el.author} date = {el.date} duration = {el.duration}
-                                    previewImage = {el.previewImage} rating = {el.rating} isPublicated = {el.isPublicated} url = {el.url}
-                                    name = {el.name} views = {el.views} screenshots = {el.screenshots} description = {el.description}
-                                />
+                                        video = {el}
+                                    />
                             })
                         : 
                             props.videos.map(el => {
                                 return <VideoPreview key = {el._id} little = {true} hideUsername = {true}
-                                    _id = {el._id} author = {el.author} date = {el.date} duration = {el.duration}
-                                    previewImage = {el.previewImage} rating = {el.rating} isPublicated = {el.isPublicated} url = {el.url}
-                                    name = {el.name} views = {el.views} screenshots = {el.screenshots} description = {el.description}
+                                    video = {el}
                                 />
                             })
                     }

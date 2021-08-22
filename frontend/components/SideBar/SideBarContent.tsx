@@ -108,7 +108,7 @@ const SideBarContent:React.FC<IProps> = ({isPortal = false}) => {
                     }
                 </ul>
             </div>
-            { sideBarReducer.moreCountSub !== 0 &&
+            { sideBarReducer.moreCountSub !== 0 && !isSubOpen &&
                 <div onClick = {subListHandler} className = {classes.subscribers__button}>
                         <div className = {`${classes.arrow} ${isSubOpen && classes.arrow_active}`}></div>
                         <span className = {`showTitle`}>{isSubOpen ? "Свернуть" : `Показать еще ${sideBarReducer.moreCountSub} каналов`}</span>

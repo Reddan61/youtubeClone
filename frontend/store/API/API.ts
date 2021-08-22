@@ -81,7 +81,11 @@ export const auth = {
 
     logout: async () => {
         try {
-            const response = await instance.delete(`auth/logout`)
+            await instance.delete(`auth/logout`)
+
+            return {
+                message:"success"
+            }
         } catch(e) {
             return {
                 message:"error"
@@ -97,6 +101,94 @@ export const video = {
         try {
             const response = await instance.patch(`videos/upload`, formData)
 
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    getVideoById: async (videoId:string,token?:string) => {
+        try {
+            const response = await instance.get(`videos/video?videoId=${videoId}`,{
+                headers: {
+                    Cookie: `token=${token}`
+                }
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    rating: async (videoId:string,rating: 1 | 2) => {
+        try {
+            const response = await instance.patch(`videos/rating`, {
+                videoId,rating
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    later: async (videoId:string) => {
+        try {
+            const response = await instance.post(`videos/later`, {
+                videoId
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    getComments: async (videoId:string,page = 1,token = "") => {
+        try {
+            const response = await instance.get(`videos/comment?videoId=${videoId}&page=${page}`,{
+                headers: {
+                    Cookie: `token=${token}`
+                }
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    addComment: async (videoId:string,text:string) => {
+        try {
+            const response = await instance.post(`videos/comment`,{
+                videoId,text
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    commentRating: async (commentId:string,rating: 1 | 2) => {
+        try {
+            const response = await instance.patch(`videos/comment`,{
+                commentId,rating
+            })
+            
             return response.data
         } catch(e) {
             return {
@@ -123,7 +215,7 @@ export const profile = {
     getVideoProfile: async (userId:string,page:number) => {
         try {
             const response = await instance.get(`videos/upload?userId=${userId}&page=${page}`)
-            
+
             return response.data
         } catch(e) {
             return {
@@ -139,6 +231,17 @@ export const profile = {
             formData.set("file",file)
 
             const response = await instance.patch(`user/avatar`,formData)
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+    subscribe: async (userId:string) => {
+        try {
+            const response = await instance.post(`user/subscribe`, {userId})
             
             return response.data
         } catch(e) {
@@ -162,4 +265,83 @@ export const sideBar = {
             }
         }
     }
+}
+
+
+export const videosList = {
+    getMainVideos: async (page:number, name = "") => {
+        try {
+            const response = await instance.get(`videos?page=${page}&name=${name}`)
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    getSubscribersVideos: async (page:number,token = "") => {
+        try {
+            const response = await instance.get(`videos/subscribe?page=${page}`, {
+                headers: {
+                    Cookie: `token=${token}`
+                }
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    getHistoryVideos: async (page:number,token = "") => {
+        try {
+            const response = await instance.get(`videos/history?page=${page}`, {
+                headers: {
+                    Cookie: `token=${token}`
+                }
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    getLaterVideos: async (page:number,token = "") => {
+        try {
+            const response = await instance.get(`videos/later?page=${page}`, {
+                headers: {
+                    Cookie: `token=${token}`
+                }
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
+
+    getLikedVideos: async (page:number,token = "") => {
+        try {
+            const response = await instance.get(`videos/liked?page=${page}`, {
+                headers: {
+                    Cookie: `token=${token}`
+                }
+            })
+            
+            return response.data
+        } catch(e) {
+            return {
+                message:"error"
+            }
+        }
+    },
 }

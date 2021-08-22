@@ -1,11 +1,29 @@
 import { makeAutoObservable } from "mobx";
-import { video } from "./API/API";
+import { profile, video } from "./API/API";
+import { IUser } from "./authReducer";
+import { IVideo } from "./videoListReducer";
 
 class VideoReducer {
-    video = null as IVideo
+    video = null as IVideo | null
+    comments = null as IComment[] | null
+    totalPages = 1
+    isSub = null as boolean | null
+    userRating = 0 as userRatingType
+    page = 1
 
     constructor() {
         makeAutoObservable(this,{},{deep:true})
+    }
+
+    async setInitialState(
+            video:IVideo,userRating:userRatingType, isSub:boolean,
+            comments: IComment[],totalPages:number
+        ) {
+        this.video = video
+        this.isSub = isSub
+        this.userRating = userRating
+        this.comments = comments
+        this.totalPages = totalPages
     }
     
     async publicateVideo(formData:FormData) {
@@ -14,132 +32,113 @@ class VideoReducer {
         return response
     }
 
+    async getVideo(videoId:string) {
+        const response = await video.getVideoById(videoId)
 
-    setInitialState(video:IVideo) {
-        this.video = {...video}
-    }
-
-    async getVideo(id:string) {
-        this.video = {...fakeVideo}
-        return {
-            video:this.video
+        if(response.message === "success") {
+            this.video = response.payload.video
+            this.isSub = response.payload.isSub
+            this.userRating = response.payload.userRating
         }
+
+        return response
     }
 
-    async addComment() {
-        await new Promise((resolve,reject) => { 
-            setTimeout(() => {
-                    this.video.comments.push(...fakeVideo.comments)
-                    resolve(true)
-            },1000)
-        })
-    }
-}
+    async subscribe(userId:string) {
+        const response = await profile.subscribe(userId)
 
-const fakeVideo:IVideo = {
-    id:"1",
-    videoSrc: "/testvideo.mp4",
-    title:"Title for video",
-    countViewers:200154,
-    date: String(new Date()),
-    rating: {
-        dislikes:120,
-        likes:2500,
-        rating:1
-    },
-    isSaved:true,
-    subInfo: {
-        userId:"1",
-        avatarSrc:"/imgTest.jpg",
-        isSub:true,
-        nickname:"nickname",
-        subscribersCount:450123,
-        text:"Voluptate voluptate mollit incididunt veniam occaecat aute incididunt aliqua laborum ex."
-    },
-    comments: [
-        {
-            userId:"2",
-            avatarSrc:"/imgTest.jpg",
-            date:String(new Date()),
-            dislikes:12,
-            likes:50,
-            nickname:"nickname comment",
-            rating:2,
-            text:"Fugiat amet et amet duis dolore cupidatat aliquip adipisicing nostrud occaecat in."
-        },
-        {
-            userId:"3",
-            avatarSrc:"/imgTest.jpg",
-            date:String(new Date()),
-            dislikes:12,
-            likes:50,
-            nickname:"nickname comment",
-            rating:1,
-            text:"Fugiat amet et amet duis dolore cupidatat aliquip adipisicing nostrud occaecat in."
-        },
-        {
-            userId:"4",
-            avatarSrc:"/imgTest.jpg",
-            date:String(new Date()),
-            dislikes:12,
-            likes:50,
-            nickname:"nickname comment",
-            rating:0,
-            text:"Fugiat amet et amet duis dolore cupidatat aliquip adipisicing nostrud occaecat in."
-        },
-        {
-            userId:"5",
-            avatarSrc:"/imgTest.jpg",
-            date:String(new Date()),
-            dislikes:12,
-            likes:50,
-            nickname:"nickname comment",
-            rating:0,
-            text:"Fugiat amet et amet duis dolore cupidatat aliquip adipisicing nostrud occaecat in."
+        if(response.message === "success") {
+            this.isSub = response.payload.isSub
         }
-    ]
-}
+        return response
+    }
+
+    async rating(videoId:string,rating:1 | 2) {
+        const response = await video.rating(videoId,rating)
+        if(response.message === "success") {
+            this.userRating = response.payload.rating
+            this.video.rating = {
+                likes:response.payload.likes,
+                dislikes:response.payload.dislikes
+            }
+        }
+        return response
+    }
 
 
+    async later(videoId:string) {
+        const response = await video.later(videoId)
+        if(this.video?._id === videoId) {
+            this.video.isSavedLater = response.payload.isAdded
+        }
+        return response
+    }
 
-export interface IVideo {
-    id:string,
-    videoSrc:string,
-    title:string,
-    countViewers:number,
-    date:string,
-    rating:IRating,
-    //Добавлено в смотреть позже
-    isSaved:boolean,
-    subInfo: IVideoSubInfo,
-    comments: IComment[]
-}
-export interface IRating {
-    likes:number,
-    dislikes:number,
-    // 0 - нет оценки/ 1 - лайк / 2 - дизлайк
-    rating: 0 | 1 | 2
+    async getComments(videoId:string,page = 1,token = "") {
+        const response = await video.getComments(videoId,page,token)
+
+        if(response.message === "success") {
+            this.comments = response.payload.comments
+            this.totalPages = response.payload.totalPages
+        }
+        
+        return response
+    }
+
+    async addComments() {
+        if(this.page >= this.totalPages) {
+            return
+        }
+
+        const response = await video.getComments(this.video._id,++this.page)
+        
+        if(response.message === "success") {
+            this.comments.push(...response.payload.comments)
+        
+            this.totalPages = response.payload.totalPages
+
+            //Если не пришло больше видео
+            if(!response.payload.comments[0]) {
+                this.totalPages = 0
+            }
+        }
+
+        return response
+    }
+
+    async addComment(text:string) {
+        const response = await video.addComment(this.video._id,text)
+
+        if(response.message = "success") {
+            this.comments.unshift(response.payload)
+        }
+
+        return response
+    }
+
+    async commentRating(commentId:string,rating: 1 | 2) {
+        const response = await video.commentRating(commentId,rating)
+        if(response.message === "success") {
+            this.comments.forEach(el => el._id === commentId ? el.rating = response.payload : el)
+        }
+
+        return response
+    }
 }
 
-export interface IVideoSubInfo {
-    userId:string,
-    avatarSrc:string,
-    nickname:string,
-    subscribersCount:number,
-    //Подписан?
-    isSub:boolean,
-    text:string
-}
+export type userRatingType = 0 | 1 | 2
 
 export interface IComment {
-    userId:string,
-    avatarSrc:string,
-    nickname:string,
-    date:string,
-    text:string,
-    likes:number,
-    dislikes:number,
-    rating: 0 | 1 | 2
+    date: string,
+    rating: {
+        likes: number,
+        dislikes: number,
+        rating?: userRatingType
+    },
+    _id: string,
+    videoId: string,
+    user: IUser,
+    text: string,
 }
 
 export default new VideoReducer()

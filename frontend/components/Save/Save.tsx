@@ -1,17 +1,18 @@
 import { Field, Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
+import videoReducer from "../../store/videoReducer";
 import CheckBox from "../Formik/CheckBox";
 import SaveIcon from "../svg/SaveIcon";
 import CrossIcon from "../svg/СrossIcon";
 import classes from "./Save.module.scss"
 
 interface IProps {
-    id:string,
+    videoId:string,
     isSaved?:boolean
 }
 
-const Save:React.FC<IProps> = ({id,isSaved = false}) => {
+const Save:React.FC<IProps> = ({videoId,isSaved = false}) => {
     const [isOpen,setOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
     const formRef = useRef(null)
@@ -34,8 +35,10 @@ const Save:React.FC<IProps> = ({id,isSaved = false}) => {
         }
     },[isOpen])
 
-    const submit = (value) => {
-        console.log(value);
+    const submit = async (value) => {
+        if(value.later !== isSaved) {
+            const laterResponse = await videoReducer.later(videoId) 
+        }
         formRef.current.setSubmitting(false)
     }
 

@@ -8,7 +8,10 @@ export const useScroll = (callback:() => Promise<void | any>) => {
     const requestRef = useRef(false)
     let oldPercent = 0
     let oldScrollPosition = 0
-
+  
+    const callbackRef = useRef(null)
+    callbackRef.current = callback
+   
     const addNewVideosOnScroll = useCallback(async (e:any) => {
         //При первой загрузке страницы скролл в топ       
         if(isFirstRef.current) {
@@ -29,7 +32,9 @@ export const useScroll = (callback:() => Promise<void | any>) => {
             oldPercent = percent;
             requestRef.current = true;
             setLoading(true)
-            await callback()
+
+            await callbackRef.current()
+
             requestRef.current = false;
             setLoading(false)
         }

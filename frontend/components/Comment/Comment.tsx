@@ -1,41 +1,34 @@
+import { observer } from "mobx-react-lite";
 import Router from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import { convertAvatarSrc } from "../../assets/functions/convertAvatarSrc";
 import { convertDate } from "../../assets/functions/convertDate";
 import { convertNumbers } from "../../assets/functions/convertRating";
-import { IComment } from "../../store/videoReducer";
+import videoReducer, { IComment } from "../../store/videoReducer";
 import DislikeIcon from "../svg/DislikeIcon";
 import LikeIcon from "../svg/LikeIcon";
 import classes from "./Comment.module.scss"
 
 interface IProps {
-    item: IComment
+    comment: IComment
 }
 
-const Comment:React.FC<IProps> = ({item}) => {
-    const {avatarSrc,userId,text,date,dislikes,likes,nickname,rating} = item
+const Comment:React.FC<IProps> = ({comment}) => {
+    const { user, rating, text, date, videoId, _id } = comment
 
-
-
-    const clickHandler = (rating:number) => {
-
-        // setRating(state => {
-        //     if(state === rating) {
-        //         return 0
-        //     }
-        //     return rating
-        // })
+    const clickHandler = async (rating: 1 | 2) => {
+        const response = await videoReducer.commentRating(_id,rating)
     }
 
     return <div className = {classes.comment}>
         <div className = {classes.comment__container}>
-            <div onClick = {() => Router.push(`/profile/${userId}`)} className = {classes.comment__image}>
-                <img src={convertAvatarSrc(avatarSrc)} alt={"avatar"} width = {"100%"} height = {"100%"}/>
+            <div onClick = {() => Router.push(`/profile/${user._id}`)} className = {classes.comment__image}>
+                <img src={convertAvatarSrc(user.avatar)} alt={"avatar"} width = {"100%"} height = {"100%"}/>
             </div>
             <div className = {classes.comment__body}>
                 <div className = {classes.comment__author}>
-                    <span onClick = {() => Router.push(`/profile/${userId}`)} className = {classes.comment__nickname}>
-                        {nickname}
+                    <span onClick = {() => Router.push(`/profile/${user._id}`)} className = {classes.comment__nickname}>
+                        {`${user.name} ${user.secondName}`}
                     </span>
                     <span className = {classes.comment__date}>
                         {convertDate(date)}
@@ -49,17 +42,17 @@ const Comment:React.FC<IProps> = ({item}) => {
                         <LikeIcon  onClick = {() => {
                                 clickHandler(1)
                             }}
-                            classModule = {`${classes.icon__like} ${rating === 1 && classes.icon__like_active}`}
+                            classModule = {`${classes.icon__like} ${rating.rating === 1 && classes.icon__like_active}`}
                         />
-                        <span>{convertNumbers(likes)}</span>
+                        <span>{convertNumbers(rating.likes)}</span>
                     </div>
                     <div  className = {classes.comment__dislikes}>
                         <DislikeIcon onClick = {() => {
                                 clickHandler(2)
                             }} 
-                            classModule = {`${classes.icon__dislike} ${rating === 2 && classes.icon__dislike_active}`}
+                            classModule = {`${classes.icon__dislike} ${rating.rating === 2 && classes.icon__dislike_active}`}
                         />
-                        <span>{convertNumbers(dislikes)}</span>
+                        <span>{convertNumbers(rating.dislikes)}</span>
                     </div>
                 </div>
             </div>
@@ -68,4 +61,4 @@ const Comment:React.FC<IProps> = ({item}) => {
 }
 
 
-export default Comment
+export default observer(Comment)

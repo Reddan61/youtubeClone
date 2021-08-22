@@ -17,6 +17,7 @@ class ProfileReducer {
         this.user = user
         this.videos = videos
         this.totalPages = totalPages
+        this.page = 1
     }
 
     async getUser(userId:string) {
@@ -34,6 +35,10 @@ class ProfileReducer {
     async getVideoProfile(page:number) {
         const response = await profile.getVideoProfile(this.user._id,page)
 
+        if(response.message === "success") {
+            this.videos = response.payload.videos
+            this.totalPages = response.payload.totalPages
+        }
 
         return response
     }

@@ -12,8 +12,8 @@ export class UserController {
     ){}
     
     @Get('profile/:id')
-    async getProfile(@Param("id") userId) {
-      return this.userService.getUserProfile(userId)
+    async getProfile(@Param("id") userId, @Req() req) {
+      return this.userService.getUserProfile(userId,req)
     }
 
     @UseGuards(JwtAuthGuard)
@@ -37,4 +37,6 @@ export class UserController {
       return this.userService.getSubscribes(req.user,query)
     }
 
+
+    
 }

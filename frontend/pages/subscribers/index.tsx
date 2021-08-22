@@ -6,10 +6,11 @@ import NonAuth from "../../components/NonAuth/NonAuth";
 import Subscribers from "../../components/Subscribers/Subscribers";
 import authReducer from '../../store/authReducer';
 import globalHistoryReducer from "../../store/globalHistoryReducer";
-import videoListReducer, { IVideoList } from "../../store/videoListReducer";
+import videoListReducer, { IVideo } from "../../store/videoListReducer";
 
 const Index:React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {
-    const list = props.list as IVideoList[]
+    const videos = props.videos as IVideo[]
+    const totalPages = props.totalPages as number
 
     useEffect(() => {
         globalHistoryReducer.addUrl("subscribers")
@@ -18,7 +19,7 @@ const Index:React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = (
     return <MainLayout>
         {authReducer.isAuth 
         ?
-        <Subscribers items = {list} />
+        <Subscribers videos = {videos} totalPages = {totalPages} />
         :
         <NonAuth />
     }
@@ -26,11 +27,14 @@ const Index:React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 }
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
-    const response = await videoListReducer.getVideoList("subscribers")
+    const response = await videoListReducer.getSubscribersVideos(1,context.req.cookies.token)
 
     return {
         props:{ 
-            ...response
+            videos:[
+                ...response.payload.videos
+            ],
+            totalPages: response.payload.totalPages
         }
     }
 }

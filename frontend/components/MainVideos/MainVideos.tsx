@@ -4,21 +4,22 @@ import LoaderIcon from "../svg/LoaderIcon";
 import VideoPreview from "../VideoPreview/VideoPreview";
 import classes from "./mainVideos.module.scss"
 import sideBarReducer from "../../store/sideBarReducer"
-import videoListReducer, { IVideoList } from "../../store/videoListReducer"
+import videoListReducer, { IVideo } from "../../store/videoListReducer"
 import { observer } from "mobx-react-lite";
 
 interface IProps {
-    items:IVideoList[]
+    videos:IVideo[],
+    totalPages:number
 }
 
 const MainVideos:React.FC<IProps> = (props) => {
     const [isBrowser,setBrowser] = useState(false)
-    const [isLoading] = useScroll(videoListReducer.addVideoList.bind(videoListReducer))
+    const [isLoading] = useScroll(videoListReducer.addMainVideos.bind(videoListReducer))
 
-    const items = isBrowser ? videoListReducer.list : props.items
+    const videos = isBrowser ? videoListReducer.videos : props.videos
 
     useEffect(() => {
-        videoListReducer.setInitialState(props.items,"main")
+        videoListReducer.setInitialState(videos,props.totalPages)
         setBrowser(true)
     },[])
     
@@ -26,11 +27,9 @@ const MainVideos:React.FC<IProps> = (props) => {
         <div className = {classes.mainVideos__container}>
             <div className = {`${classes.mainVideos__containerVideos} ${!sideBarReducer.isOpenSideBar ? classes.mainVideos__containerVideos_open : classes.mainVideos__containerVideos_close}`}>
                 {
-                    items.map(el => {
-                        return <VideoPreview key = {el.id} 
-                            id = {el.id} author = {el.author} date = {el.date} delay = {el.delay}
-                            previewsSrc = {el.previewsSrc} userId = {el.userId} 
-                            videoTitle = {el.videoTitle} viewersCount = {el.viewersCount} videoPreview = {el.videoPreview}
+                    videos.map(el => {
+                        return <VideoPreview key = {el._id}
+                            video = {el}
                         />
                     })
                 }

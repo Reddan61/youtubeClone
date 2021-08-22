@@ -17,6 +17,7 @@ const Player:React.FC<IProps> = ({id}) => {
     const progressBarRef = useRef<HTMLDivElement>(null)
     const progressMaskRef = useRef<HTMLDivElement>(null)
     const videoRef = useRef<HTMLVideoElement>(null)
+    const videoContainerRef = useRef<HTMLDivElement>(null)
 
     const togglePlay  = useCallback(() => {
         setIsPlaying(state => {
@@ -37,9 +38,10 @@ const Player:React.FC<IProps> = ({id}) => {
 
     const convertDuration = (time:number) => { 
         const videoDuration = Math.round(time)
-        const minutes = (videoDuration/60) < 1 ? 0 :videoDuration/60
-        const seconds = (videoDuration%60) < 1 ? 0 : videoDuration%60
-
+        const minutes = Math.trunc((videoDuration/60) < 1 ? 0 :videoDuration/60)
+        const seconds = Math.trunc((videoDuration%60) < 1 ? 0 : videoDuration%60)
+        
+        
         return `${minutes<10 ? `0${minutes}` :minutes }:${seconds<10?`0${seconds}`:seconds}`;
     }
 
@@ -89,11 +91,11 @@ const Player:React.FC<IProps> = ({id}) => {
         const width = video.offsetWidth
         const height = width / 1.78 
         video.style.height = height + "px" 
+        videoContainerRef.current.style.height = height + "px"
     },[])
 
     useEffect(() => {
         videoRef.current.src = `http://localhost:8888/videos/stream/${id}`
-        //videoRef.current.src = `/testvideo.mp4`
     },[id])
 
     useEffect(() => {
@@ -123,7 +125,10 @@ const Player:React.FC<IProps> = ({id}) => {
         if(!isVisibleControls) {
             setVisibleControls(true)
         }
-    }} onMouseLeave = {() => setVisibleControls(false)} onMouseEnter = {hoverBlock} className = {classes.player}>
+    }} onMouseLeave = {() => setVisibleControls(false)} 
+        onMouseEnter = {hoverBlock} className = {classes.player}
+        ref = {videoContainerRef}
+    >
         <CSSTransition in = {isVisibleControls} timeout = {300} unmountOnExit
             classNames = {{
                 enter:classes.animation__enter,

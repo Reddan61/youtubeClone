@@ -10,17 +10,30 @@ import LoaderIcon from "../svg/LoaderIcon";
 import authReducer from "../../store/authReducer";
 import { observer } from "mobx-react-lite";
 import { convertAvatarSrc } from "../../assets/functions/convertAvatarSrc";
-import videoReducer, { IVideo } from "../../store/videoReducer";
+import videoReducer, { IComment } from "../../store/videoReducer";
+import { IVideo } from "../../store/videoListReducer";
+
+interface IProps {
+    video: IVideo,
+    isSub:boolean,
+    comments:IComment[],
+    totalPages:number,
+    userRating: 0 | 1 | 2
+}
 
 
-const VideoPage:React.FC<IVideo> = (props) => {
+const VideoPage:React.FC<IProps> = (props) => {
+
     const [textAreaText,setTextAreaText] = useState("")
     const [showButtons,setShowButtons] = useState(false)
     const [isBrowser,setIsBrowser] = useState(false)
-    const [isLoading] = useScroll(videoReducer.addComment.bind(videoReducer))
+    const [isLoading] = useScroll(videoReducer.addComments.bind(videoReducer))
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-    const video = isBrowser ? videoReducer.video : props
+    const video = isBrowser ? videoReducer.video : props.video
+    const comments = isBrowser ? videoReducer.comments : props.comments
+    const isSub = isBrowser ? videoReducer.isSub : props.isSub
+    const userRating = isBrowser ? videoReducer.userRating : props.userRating
 
     const convertViewers = (count:number) => {
         const countStr = String(count)
@@ -57,42 +70,45 @@ const VideoPage:React.FC<IVideo> = (props) => {
         setTextAreaText(target.value)
     }
 
-    const sendTextArea = () => {
-        console.log('sended');
-        
+    const sendComment = async () => {
+        const response = await videoReducer.addComment(textAreaText)
     }
 
     useEffect(() => {
-        videoReducer.setInitialState(props)
+        videoReducer.setInitialState(
+                video,props.userRating, props.isSub,
+                comments,props.totalPages
+            )
         setIsBrowser(true)
     },[])    
+
     return <div className = {classes.videoPage}>
         <div className = {classes.videoPage__container}>
             <div className = {classes.videoPage__left}>
-                <Player src = {video.videoSrc} />
+                <Player id = {video._id}/>
                 <div className = {classes.videoPage__info}>
                     <div className = {classes.videoPage__title}>
-                        <h1>{video.title}</h1>
+                        <h1>{video.name}</h1>
                     </div>
                     <div className = {classes.videoPage__subInfo}>
                         <div className = {classes.subInfo}>
-                            {convertViewers(video.countViewers)}
+                            {convertViewers(video.views)}
                             <div className = {classes.subInfo__dot}>
                                 <div></div>
                             </div>
                             <span>{convertDate(new Date(video.date))}</span>
                         </div>
                         <div className = {classes.videoPage__add}>
-                            <Rating rating = {video.rating.rating} likes = {video.rating.likes} dislikes = {video.rating.dislikes} />
-                            <Save id = {"1"} isSaved = {video.isSaved}/>
+                            <Rating videoId = {video._id} rating = {userRating} likes = {video.rating.likes} dislikes = {video.rating.dislikes} />
+                            <Save videoId = {video._id} isSaved = {video.isSavedLater}/>
                         </div>
                     </div>
-                    <VideoInfo info = {video.subInfo}/>
+                    <VideoInfo author = {video.author} description = {video.description} isSub = {isSub}/>
                 </div>
                 {authReducer.isAuth && 
                     <div className = {classes.send}>
                         <div className = {classes.send__image}>
-                            <img src={convertAvatarSrc(authReducer.user.avatarSrc)} alt="img" width = {"100%"} height = {"100%"}/>
+                            <img src={convertAvatarSrc(authReducer.user.avatar)} alt="img" width = {"100%"} height = {"100%"}/>
                         </div>
                         <div className = {classes.send__body}>
                             <div className = {classes.send__textarea}>
@@ -106,7 +122,7 @@ const VideoPage:React.FC<IVideo> = (props) => {
                                         setTextAreaText("")
                                         setShowButtons(false)
                                     }}className = {classes.send__cancel}>Отмена</button>
-                                    <button onClick = {sendTextArea} disabled = {textAreaText.length === 0} className = {classes.send__submit}>Оставить комментарий</button>
+                                    <button onClick = {sendComment} disabled = {textAreaText.length === 0} className = {classes.send__submit}>Оставить комментарий</button>
                                 </div>
                             }               
                         </div>
@@ -114,8 +130,8 @@ const VideoPage:React.FC<IVideo> = (props) => {
                 }
                 <div className = {classes.videoPage__comments}>
                     {
-                        video.comments.map(el => {
-                            return <Comment key = {el.text + el.userId + el.date} item = {el}/>
+                        comments.map(el => {
+                            return <Comment key = {el.text + el.user._id + el.date} comment = {el}/>
                         })
                     }
                 </div>

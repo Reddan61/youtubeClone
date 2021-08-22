@@ -1,50 +1,194 @@
 import { makeAutoObservable } from "mobx"
+import { videosList } from "./API/API"
 import { IUser } from "./authReducer"
 
 class VideoListReducer {
-    list = [] as IVideo[]
-    listType = null as videoListType | null
+    videos = [] as IVideo[]
+    page = 1
+    totalPages = 1
 
     constructor() {
         makeAutoObservable(this,{},{deep:true})
     }
 
-    // setInitialState(list:IVideoList[],listType:videoListType) {
-    //     this.listType = listType
-    //     this.list = list
-    // }
+    async setInitialState(videos:IVideo[],totalPages:number) {
+        this.videos = videos
+        this.totalPages = totalPages
+        this.page = 1
+    }
 
-    // async getVideoList(listType:videoListType) {
-    //     switch (listType) {
-    //         case "main":
-    //             this.list = initialListMainTest
-    //         case "subscribers":
-    //             this.list = initialListMainTest
-    //         case "search":
-    //             this.list = initialListMainTest
-    //         case "liked":
-    //             this.list = initialListMainTest
-    //         case "history":
-    //             this.list = initialListMainTest
-    //         case "later":
-    //             this.list = initialListMainTest
-    //     }
-    //     return {
-    //         list:this.list
-    //     }
-    // }
+    async getMainVideos(page:number,name = "") {
+        const response = await videosList.getMainVideos(page,name)
 
-    // async addVideoList() {
-    //     await new Promise((resolve,reject) => { 
-    //         setTimeout(() => {
-    //                 this.list.push(...initialListMainTest)
-    //                 resolve(true)
-    //         },1000)
-    //     })
-    // }
+        if(response.message === "success") {
+            this.videos = response.payload.videos
+            this.totalPages = response.payload.totalPages
+            this.page = 1
+        }
+        
+        return response
+    }
+
+    async getSubscribersVideos(page:number,token = "") {
+        const response = await videosList.getSubscribersVideos(page,token)
+        
+        if(response.message === "success") {
+            this.videos = response.payload.videos
+            this.totalPages = response.payload.totalPages
+            this.page = 1
+        }
+        
+        return response
+    }
+
+    async getHistoryVideos(page:number,token = "") {
+        const response = await videosList.getHistoryVideos(page,token)
+        
+        if(response.message === "success") {
+            this.videos = response.payload.videos
+            this.totalPages = response.payload.totalPages
+            this.page = 1
+        }
+        
+        return response
+    }
+
+    async getLaterVideos(page:number,token = "") {
+        const response = await videosList.getLaterVideos(page,token)
+        
+        if(response.message === "success") {
+            this.videos = response.payload.videos
+            this.totalPages = response.payload.totalPages
+            this.page = 1
+        }
+        
+        return response
+    }
+
+    async getLikedVideos(page:number,token = "") {
+        const response = await videosList.getLikedVideos(page,token)
+        
+        if(response.message === "success") {
+            this.videos = response.payload.videos
+            this.totalPages = response.payload.totalPages
+            this.page = 1
+        }
+        
+        return response
+    }
+
+    async addMainVideos(name = "") {
+        if(this.page >= this.totalPages) {
+            return
+        }
+
+        const response = await videosList.getMainVideos(++this.page,name)
+        
+        
+        if(response.message === "success") {
+            this.videos.push(...response.payload.videos)
+        
+            this.totalPages = response.payload.totalPages
+
+            //Если не пришло больше видео
+            if(!response.payload.videos[0]) {
+                this.totalPages = 0
+            }
+        }
+
+        return response
+    }
+
+    async addSubscribersVideos() {
+        if(this.page >= this.totalPages) {
+            return
+        }
+
+        const response = await videosList.getSubscribersVideos(++this.page)
+        
+        
+        if(response.message === "success") {
+            this.videos.push(...response.payload.videos)
+        
+            this.totalPages = response.payload.totalPages
+
+            //Если не пришло больше видео
+            if(!response.payload.videos[0]) {
+                this.totalPages = 0
+            }
+        }
+
+        return response
+    }
+
+    async addHistoryVideos() {
+        if(this.page >= this.totalPages) {
+            return
+        }
+
+        const response = await videosList.getHistoryVideos(++this.page)
+        
+        
+        if(response.message === "success") {
+            this.videos.push(...response.payload.videos)
+        
+            this.totalPages = response.payload.totalPages
+
+            //Если не пришло больше видео
+            if(!response.payload.videos[0]) {
+                this.totalPages = 0
+            }
+        }
+
+        return response
+    }
+
+    async addLaterVideos() {
+        if(this.page >= this.totalPages) {
+            return
+        }
+
+        const response = await videosList.getLaterVideos(++this.page)
+        
+        
+        if(response.message === "success") {
+            this.videos.push(...response.payload.videos)
+        
+            this.totalPages = response.payload.totalPages
+
+            //Если не пришло больше видео
+            if(!response.payload.videos[0]) {
+                this.totalPages = 0
+            }
+        }
+
+        return response
+    }
+
+    async addLikedVideos() {
+        if(this.page >= this.totalPages) {
+            return
+        }
+
+        const response = await videosList.getLikedVideos(++this.page)
+        
+        
+        if(response.message === "success") {
+            this.videos.push(...response.payload.videos)
+        
+            this.totalPages = response.payload.totalPages
+
+            //Если не пришло больше видео
+            if(!response.payload.videos[0]) {
+                this.totalPages = 0
+            }
+        }
+
+        return response
+    }
+
+
 }
-
-type videoListType = "main" | "subscribers" | "search" | "liked" | "history" | "later"
 
 
 export interface IVideo {
@@ -62,7 +206,8 @@ export interface IVideo {
     description:string,
     name:string,
     previewImage:string,
-    duration:number
+    duration:number,
+    isSavedLater?:boolean
 }
 
 export default new VideoListReducer()

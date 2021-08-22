@@ -6,10 +6,11 @@ import MainLayout from '../../components/MainLayout/MainLayout'
 import NonAuth from '../../components/NonAuth/NonAuth'
 import authReducer from '../../store/authReducer';
 import globalHistoryReducer from '../../store/globalHistoryReducer';
-import videoListReducer, { IVideoList } from '../../store/videoListReducer';
+import videoListReducer, { IVideo } from '../../store/videoListReducer';
 
 const Index:React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => {
-    const list = props.list as IVideoList[]
+    const videos = props.videos as IVideo[]
+    const totalPages = props.totalPages as number
     
     useEffect(() => {
         globalHistoryReducer.addUrl("liked")
@@ -18,7 +19,7 @@ const Index:React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = (
     return <MainLayout>
         {authReducer.isAuth 
         ?
-        <Liked  items = {list}/>
+        <Liked videos = {videos} totalPages = {totalPages}/>
         : 
         <NonAuth />
        }
@@ -26,11 +27,14 @@ const Index:React.FC<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 }
 
 export const getServerSideProps:GetServerSideProps = async (context) => {
-    const response = await videoListReducer.getVideoList("liked")
+    const response = await videoListReducer.getLikedVideos(1,context.req.cookies.token)
 
     return {
         props:{ 
-            ...response
+            videos:[
+                ...response.payload.videos
+            ],
+            totalPages: response.payload.totalPages
         }
     }
 }

@@ -12,6 +12,7 @@ import * as Yup from 'yup';
 import axios from "axios";
 import { instance } from "../../store/API/API";
 import videoReducer from "../../store/videoReducer";
+import LoaderIcon from "../svg/LoaderIcon";
 
 interface IProps {
     setPopUp: (bool:boolean) => void
@@ -22,6 +23,7 @@ interface IProps {
 const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
     const ref = useRef<HTMLDivElement>(null)
     const [isBrowser,setBrowser] = useState(false)
+    const [isLoading,setLoading] = useState(false)
     const [title,setTitle] = useState('')
     const [imageBadge,setImageBadge] = useState<File | null>(null)
     const [videoId,setVideoId] = useState<null | string>(null)
@@ -84,6 +86,7 @@ const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
             alert("Выберите значок")
             return
         }
+        setLoading(true)
         const formData = new FormData()
 
         formData.set("name",values.name)
@@ -98,114 +101,120 @@ const UploadVideo:React.FC<IProps> = ({setPopUp}) => {
         } else {
             alert("Что-то пошло не так!")
         }
-        
+        setLoading(false)
         setSubmitting(false)
     }
     return <>
         {isBrowser && ReactDOM.createPortal(<div className = {classes.upload}>
             <div className = {classes.upload__container}>
-                <div className = {classes.upload__header}>
-                    <span>
-                        {
-                            isUploadedVideo ? 
-                                title 
-                            :
-                                "Загрузка видео"
-                        }
-                    </span>
-                    <CrossIcon onClick = {() => { setPopUp(false)}} classModule = {classes.icon__cross}/>
-                </div>
-                <div className = {`
-                    ${classes.upload__body}
-                    ${!isUploadedVideo && classes.upload__body_first}
-                `}>
-                    { isUploadedVideo ?
-                    <>
-                        <div className = {classes.upload__left}>
-                            <div className = {classes.upload__title}>
-                                Информация
+                {isLoading ?
+                    <LoaderIcon classModule = {classes.icon__loader}/>
+                :
+                <>
+                    <div className = {classes.upload__header}>
+                        <span>
+                            {
+                                isUploadedVideo ? 
+                                    title 
+                                :
+                                    "Загрузка видео"
+                            }
+                        </span>
+                        <CrossIcon onClick = {() => { setPopUp(false)}} classModule = {classes.icon__cross}/>
+                    </div>
+                    <div className = {`
+                        ${classes.upload__body}
+                        ${!isUploadedVideo && classes.upload__body_first}
+                    `}>
+                        { isUploadedVideo ?
+                        <>
+                            <div className = {classes.upload__left}>
+                                <div className = {classes.upload__title}>
+                                    Информация
+                                </div>
+                                <div>
+                                    <Formik
+                                        initialValues = {{
+                                            name:"",
+                                            description:""
+                                        }}
+                                        onSubmit = {submit}
+                                        validationSchema = {uploadSchema}
+                                        innerRef = {formRef}
+                                    >
+                                        {({values,touched,errors}) => (
+                                            <Form>
+                                                <Field component = {TextArea} 
+                                                    name = {"name"}
+                                                    label = {"Название"} 
+                                                    placeholder = {"Добавьте название, которое оторажает содержание вашего ролика"}
+                                                    maxCount = {100}
+                                                    count = {values.name.length}  
+                                                    className = {classes.upload__name}  
+                                                    isError = {Boolean(errors.name) && touched.name}
+                                                    handleChange = {changeTitle}
+                                                />
+                                                <Field component = {TextArea}
+                                                    name = {"description"}
+                                                    label = {"Описание"} 
+                                                    placeholder = {"Расскажите, о чем ваше видео"}
+                                                    maxCount = {5000}
+                                                    count = {values.description.length}  
+                                                    className = {classes.upload__description} 
+                                                    isError = {Boolean(errors.description) && touched.description}
+                                                />
+                                            </Form>
+                                        )}    
+                                    </Formik>
+                                </div>
+                                <div className = {classes.upload__badge}>
+                                    <span>
+                                        Значок
+                                    </span>
+                                    <Badge takeImageFile = {setImageBadge}/>
+                                </div>
                             </div>
-                            <div>
-                                <Formik
-                                    initialValues = {{
-                                        name:"",
-                                        description:""
-                                    }}
-                                    onSubmit = {submit}
-                                    validationSchema = {uploadSchema}
-                                    innerRef = {formRef}
-                                >
-                                    {({values,touched,errors}) => (
-                                        <Form>
-                                            <Field component = {TextArea} 
-                                                name = {"name"}
-                                                label = {"Название"} 
-                                                placeholder = {"Добавьте название, которое оторажает содержание вашего ролика"}
-                                                maxCount = {100}
-                                                count = {values.name.length}  
-                                                className = {classes.upload__name}  
-                                                isError = {Boolean(errors.name) && touched.name}
-                                                handleChange = {changeTitle}
-                                            />
-                                            <Field component = {TextArea}
-                                                name = {"description"}
-                                                label = {"Описание"} 
-                                                placeholder = {"Расскажите, о чем ваше видео"}
-                                                maxCount = {5000}
-                                                count = {values.description.length}  
-                                                className = {classes.upload__description} 
-                                                isError = {Boolean(errors.description) && touched.description}
-                                            />
-                                        </Form>
-                                    )}    
-                                </Formik>
+                            <div className = {classes.upload__right}>
+                                <div className = {classes.upload__player}>
+                                    <Player id = {videoId}/>
+                                </div>
                             </div>
-                            <div className = {classes.upload__badge}>
-                                <span>
-                                    Значок
-                                </span>
-                                <Badge takeImageFile = {setImageBadge}/>
-                            </div>
-                        </div>
-                        <div className = {classes.upload__right}>
-                            <div className = {classes.upload__player}>
-                                <Player id = {videoId}/>
-                            </div>
-                        </div>
-                    </>
-                    :
-                    <div className = {classes.videoUpload}
-                        onDragEnter = {(e) => e.preventDefault()}
-                        onDragOver = {(e) => e.preventDefault()}
-                        onDrop = {videoUploadHandler}
-                    >
-                        <UploadCircleIcon classModule = {classes.icon__upload}/>
-                        <span className = {classes.videoUpload__title}>Перетащите файл сюда или нажмите кнопку ниже, чтобы выбрать видео на компьютере.</span>
-                        <span className = {classes.videoUpload__subtitle}>Пока вы не опубликуете видео, доступ к ним будет ограничен.</span>
-                        <input 
-                            ref = {inputRef} type = {"file"} style = {{display:"none"}}
-                            onChange = {videoUploadHandler}
-                        />
-                        <div onClick = {() => {
-                            inputRef.current.click()
-                        }}
-                            className = {classes.videoUpload__button}
+                        </>
+                        :
+                        <div className = {classes.videoUpload}
+                            onDragEnter = {(e) => e.preventDefault()}
+                            onDragOver = {(e) => e.preventDefault()}
+                            onDrop = {videoUploadHandler}
                         >
-                            <BlueButton label = {"Выбрать файл"} />
-                        </div>
-                    </div>
-                    }
-                </div>
-                {isUploadedVideo &&
-                    <div className = {classes.upload__bottom}>
-                        <span>{`Загружен ${progressRef.current}%`}</span>
-                        <div className = {classes.upload__button_next}>
-                            <BlueButton 
-                                disabled = {formRef.current?.isSubmitting}
-                                onClick = {() => formRef.current.handleSubmit()} label = {"Далее"}
+                            <UploadCircleIcon classModule = {classes.icon__upload}/>
+                            <span className = {classes.videoUpload__title}>Перетащите файл сюда или нажмите кнопку ниже, чтобы выбрать видео на компьютере.</span>
+                            <span className = {classes.videoUpload__subtitle}>Пока вы не опубликуете видео, доступ к ним будет ограничен.</span>
+                            <input 
+                                ref = {inputRef} type = {"file"} style = {{display:"none"}}
+                                onChange = {videoUploadHandler}
                             />
+                            <div onClick = {() => {
+                                inputRef.current.click()
+                            }}
+                                className = {classes.videoUpload__button}
+                            >
+                                <BlueButton label = {"Выбрать файл"} />
+                            </div>
                         </div>
+                        }
                     </div>
+                    {isUploadedVideo &&
+                        <div className = {classes.upload__bottom}>
+                            <span>{`Загружен ${progressRef.current}%`}</span>
+                            <div className = {classes.upload__button_next}>
+                                <BlueButton 
+                                    disabled = {formRef.current?.isSubmitting}
+                                    onClick = {() => formRef.current.handleSubmit()} label = {"Далее"}
+                                />
+                            </div>
+                        </div>
+                    } 
+                </>
                 }
             </div>
         </div>,ref.current)}

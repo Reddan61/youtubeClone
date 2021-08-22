@@ -83,7 +83,7 @@ export class CommentService {
                     return {...el.toObject(),
                         rating: {
                             ...el.toObject().rating,
-                            userRating: rated[0].rating
+                            rating: rated[0].rating
                         }
                     }
                 }),

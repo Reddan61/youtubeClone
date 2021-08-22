@@ -4,21 +4,39 @@ import { InjectModel } from "@nestjs/mongoose";
 import * as mongoose from 'mongoose'
 import { FilterQuery, LeanDocument, Model } from "mongoose";
 import { User, UserDocument } from "./schemas/user.schema";
+import { Request } from 'express';
+import jwtDecode from 'jwt-decode';
 
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-    async getUserProfile(userId: string) {
+    async getUserProfile(userId: string,req:Request) {
         if(!mongoose.Types.ObjectId.isValid(userId)) {
             throw new BadRequestException()
         }
+        let isSub = false
 
+        let userIdAuth = null as null | string
+
+        if(req.cookies.token) {
+            const decodedToken:IValidateJWT = jwtDecode(req.cookies.token as string)
+
+            if(!mongoose.Types.ObjectId.isValid(decodedToken.userId)) {
+                throw new BadRequestException()
+            }
+
+            userIdAuth = decodedToken.userId
+        }
         //const result = await this.userModel.findById(userId).select(["uploadIds","avatar","_id","name","secondName"]).populate({path:"uploadIds",match: { isPublicated: true},populate: {path:'author',select:["avatar","_id","name","secondName"]}}).exec()
         const result = await this.userModel.findById(userId).select(["avatar","_id","name","secondName"]).exec()
 
         if(!result) {
             throw new BadRequestException()
+        }
+
+        if(userIdAuth) {
+            isSub = await this.checkSubscribe(result._id,userIdAuth)
         }
 
         const subscribersCount = await this.getSubscribersCount(result._id)
@@ -28,7 +46,8 @@ export class UserService {
             message:"success",
             payload: {
                 ...result.toObject(),
-                subscribersCount
+                subscribersCount,
+                isSub
             }
         }
     }
@@ -454,5 +473,19 @@ export class UserService {
         }).exec()
 
         return user.length
+    }
+
+    async isAddedLater(userId:string,videoId:string) {
+        const user = await this.userModel.findById(userId).exec()
+
+        if(!userId) {
+            throw new BadRequestException()
+        }
+
+        const { later } = user
+
+        const laterFiltered = later.filter(el => String(el) === String(videoId))
+
+        return  laterFiltered[0] ? true : false
     }
 }

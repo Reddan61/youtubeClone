@@ -46,7 +46,7 @@ export class VideosService {
             userId = decodedToken.userId
         }
 
-        const video = await this.videoModel.findById(videoId)
+        const video = await this.videoModel.findById(videoId).populate({path:"author", select: ["avatar","_id","name","secondName"]}).exec()
 
 
         if(!video) {
@@ -55,9 +55,13 @@ export class VideosService {
 
         let userRating = 0
         let isSub = false
+        let isSavedLater = false
 
-        //Профиль автора
-        const user = await this.userService.getUserByVideoId(video._id)
+        interface IAuthor extends User {
+            _id:string
+        }
+        const { _id : authorId } = video.author as IAuthor
+
 
         if(userId) {
             userRating = await this.userService.getVideoUserRating(userId,video._id)
@@ -67,18 +71,28 @@ export class VideosService {
                 views: video.views + 1
             })
 
-            isSub = await this.userService.checkSubscribe(user._id,userId)
+
+            isSavedLater = await this.userService.isAddedLater(userId,video._id)
+            isSub = await this.userService.checkSubscribe(authorId,userId)
         }
 
+        const subscribersCount = await this.userService.getSubscribersCount(authorId)
 
         return {
             message:"success",
             payload: {
                 video: {
                     ...video.toObject(),
-                    user,
-                    isSub
+                    isSavedLater,
+                    author: {
+                        avatar:video.toObject().author.avatar,
+                        name:video.toObject().author.name,
+                        secondName:video.toObject().author.secondName,
+                        _id:(video.toObject().author as IAuthor)._id,
+                        subscribersCount
+                    }
                 },
+                isSub,
                 userRating
             }
         }
@@ -402,7 +416,10 @@ export class VideosService {
 
         return {
             message:"success",
-            payload: videos
+            payload: {
+                videos,
+                totalPages
+            }
         }
     }
 

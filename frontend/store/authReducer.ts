@@ -53,6 +53,8 @@ class Auth {
             this.user = null
             this.isAuth = false
         }
+
+        return response
     }
 }
 
@@ -69,7 +71,8 @@ export interface IUser {
     _id:string,
     avatar:string | null,
     name:string,
-    secondName:string
+    secondName:string,
+    subscribersCount?:number
 }
 
 
